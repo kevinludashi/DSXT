@@ -1,0 +1,3462 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title></title>
+    <script type="text/javascript">
+    		
+   		document.addEventListener('plusready', function(){
+   			//console.log("所有plus api都应该在此事件发生后调用，否则会出现plus is undefined。")
+   			
+   		});
+   		
+    </script>
+</head>
+<body>
+	
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电商产品及订单管理系统 v17.8</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+	<style>
+		/* 所有样式保持不变 */
+		:root {
+		    --primary-color: #4e73df;
+		    --primary-light: #7a9af9;
+		    --bg-color: #f8f9fa;
+		    --card-bg: #ffffff;
+		    --text-color: #212529;
+		    --light-text: #6c757d;
+		    --border-color: #dee2e6;
+		    --header-color: #e9ecef;
+		    --success-color: #1cc88a;
+		    --danger-color: #e74a3b;
+		    --warning-color: #f6c23e;
+		    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		    --base-font-size: 16px;
+		}
+		
+		* {
+		    margin: 0;
+		    padding: 0;
+		    box-sizing: border-box;
+		    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+		}
+		
+		body {
+		    background-color: var(--bg-color);
+		    color: var(--text-color);
+		    line-height: 1.6;
+		    padding: 0;
+		    overflow-x: hidden;
+		    min-height: 100vh;
+		    position: relative;
+		    font-size: var(--base-font-size);
+		}
+		
+		.app-container {
+		    max-width: 100%;
+		    margin: 0 auto;
+		    padding-bottom: 100px;
+		}
+		
+		/* 头部样式 */
+		.app-header {
+		    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+		    color: white;
+		    padding: 15px 20px;
+		    text-align: center;
+		    box-shadow: var(--shadow);
+		    position: sticky;
+		    top: 0;
+		    z-index: 100;
+		}
+		
+		.app-header h1 {
+		    font-size: 1.3rem;
+		    font-weight: 600;
+		    margin-bottom: 5px;
+		}
+		
+		.app-header p {
+		    font-size: 0.8rem;
+		    opacity: 0.9;
+		}
+		
+		/* 内容区域样式 */
+		.tab-content {
+		    display: none;
+		    padding: 15px;
+		}
+		
+		.tab-content.active {
+		    display: block;
+		    animation: fadeIn 0.3s ease;
+		}
+		
+		@keyframes fadeIn {
+		    from { opacity: 0; transform: translateY(10px); }
+		    to { opacity: 1; transform: translateY(0); }
+		}
+		
+		.card {
+		    background: var(--card-bg);
+		    border-radius: 10px;
+		    box-shadow: var(--shadow);
+		    margin-bottom: 20px;
+		    overflow: hidden;
+		}
+		
+		.card-header {
+		    background-color: var(--header-color);
+		    padding: 12px 15px;
+		    font-weight: 600;
+		    border-bottom: 1px solid var(--border-color);
+		    display: flex;
+		    align-items: center;
+		    justify-content: space-between;
+		    flex-wrap: wrap;
+		    gap: 10px;
+		}
+		
+		.card-body {
+		    padding: 15px;
+		}
+		
+		.form-group {
+		    margin-bottom: 15px;
+		}
+		
+		.form-group label {
+		    display: block;
+		    margin-bottom: 5px;
+		    font-weight: 500;
+		    color: var(--text-color);
+		}
+		
+		.form-control {
+		    width: 100%;
+		    padding: 12px 15px;
+		    border: 1px solid var(--border-color);
+		    border-radius: 8px;
+		    font-size: 1rem;
+		    background-color: white;
+		    transition: border-color 0.3s;
+		}
+		
+		.form-control:focus {
+		    outline: none;
+		    border-color: var(--primary-color);
+		    box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.2);
+		}
+		
+		.input-group {
+		    display: flex;
+		    gap: 10px;
+		    flex-wrap: wrap;
+		}
+		
+		.input-group .form-control {
+		    flex: 1;
+		}
+		
+		.cost-input {
+		    flex: 1;
+		    display: flex;
+		    flex-direction: column;
+		}
+		
+		.cost-input label {
+		    font-size: 0.8rem;
+		    margin-bottom: 5px;
+		    color: var(--light-text);
+		}
+		
+		.btn {
+		    display: inline-block;
+		    padding: 12px 20px;
+		    background-color: var(--primary-color);
+		    color: white;
+		    border: none;
+		    border-radius: 8px;
+		    font-weight: 600;
+		    cursor: pointer;
+		    text-align: center;
+		    transition: background-color 0.3s;
+		    font-size: 1rem;
+		}
+		
+		.btn-block {
+		    display: block;
+		    width: 100%;
+		}
+		
+		.btn:hover {
+		    background-color: #2e59d9;
+		}
+		
+		.btn-success {
+		    background-color: var(--success-color);
+		}
+		
+		.btn-success:hover {
+		    background-color: #17a673;
+		}
+		
+		.btn-danger {
+		    background-color: var(--danger-color);
+		}
+		
+		.btn-danger:hover {
+		    background-color: #d52a1a;
+		}
+		
+		.btn-warning {
+		    background-color: var(--warning-color);
+		    color: #212529;
+		}
+		
+		.btn-warning:hover {
+		    background-color: #e4b30d;
+		}
+		
+		.btn-info {
+		    background-color: #36b9cc;
+		    color: white;
+		}
+		
+		.btn-info:hover {
+		    background-color: #2a96a5;
+		}
+		
+		.btn-group {
+		    display: flex;
+		    gap: 10px;
+		    margin-top: 15px;
+		    flex-wrap: wrap;
+		}
+		
+		.btn-group .btn {
+		    flex: 1;
+		}
+		
+		/* 图片预览样式 */
+		.image-preview {
+		    width: 100%;
+		    height: 200px;
+		    background-color: white;
+		    border: 1px solid var(--border-color);
+		    border-radius: 8px;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    margin: 15px 0;
+		    overflow: hidden;
+		}
+		
+		.image-preview img {
+		    max-width: 100%;
+		    max-height: 100%;
+		    object-fit: contain;
+		    cursor: pointer;
+		}
+		
+		.image-placeholder {
+		    color: var(--light-text);
+		    text-align: center;
+		    padding: 20px;
+		}
+		
+		.image-placeholder i {
+		    font-size: 3rem;
+		    margin-bottom: 10px;
+		    color: #ced4da;
+		}
+		
+		/* 表格样式 */
+		.table-container {
+		    overflow-x: auto;
+		    margin-top: 15px;
+		    border-radius: 8px;
+		    border: 1px solid var(--border-color);
+		    max-height: 400px;
+		    overflow-y: auto;
+		    position: relative;
+		}
+		
+		.data-table {
+		    width: 100%;
+		    border-collapse: collapse;
+		    min-width: 900px;
+		}
+		
+		.data-table th {
+		    background-color: var(--primary-color);
+		    color: white;
+		    padding: 12px 15px;
+		    text-align: left;
+		    font-weight: 600;
+		    position: sticky;
+		    top: 0;
+		    z-index: 2;
+		}
+		
+		.data-table td {
+		    padding: 12px 15px;
+		    border-bottom: 1px solid var(--border-color);
+		}
+		
+		.data-table tr:nth-child(even) {
+		    background-color: var(--header-color);
+		}
+		
+		.data-table tr:hover {
+		    background-color: rgba(78, 115, 223, 0.05);
+		}
+		
+		.thumbnail {
+		    width: 50px;
+		    height: 50px;
+		    object-fit: cover;
+		    border-radius: 4px;
+		    cursor: pointer;
+		    transition: transform 0.3s;
+		}
+		
+		.thumbnail:hover {
+		    transform: scale(1.05);
+		    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+		}
+		
+		.action-cell {
+		    display: flex;
+		    gap: 5px;
+		}
+		
+		.action-btn {
+		    padding: 5px 10px;
+		    border-radius: 4px;
+		    font-size: 0.85rem;
+		    cursor: pointer;
+		}
+		
+		/* 底部导航 */
+		.bottom-nav {
+		    position: fixed;
+		    bottom: 0;
+		    left: 0;
+		    right: 0;
+		    background: white;
+		    display: flex;
+		    justify-content: space-around;
+		    padding: 10px 0;
+		    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+		    z-index: 100;
+		}
+		
+		.nav-item {
+		    display: flex;
+		    flex-direction: column;
+		    align-items: center;
+		    font-size: 0.8rem;
+		    color: var(--light-text);
+		    cursor: pointer;
+		}
+		
+		.nav-item.active {
+		    color: var(--primary-color);
+		}
+		
+		.nav-item i {
+		    font-size: 1.3rem;
+		    margin-bottom: 3px;
+		}
+		
+		/* 统计卡片 */
+		.stats-container {
+		    display: grid;
+		    grid-template-columns: repeat(2, 1fr);
+		    gap: 15px;
+		    margin-bottom: 20px;
+		}
+		
+		.stat-card {
+		    background: white;
+		    border-radius: 10px;
+		    padding: 15px;
+		    box-shadow: var(--shadow);
+		    text-align: center;
+		}
+		
+		.stat-card .value {
+		    font-size: 1.5rem;
+		    font-weight: 700;
+		    color: var(--primary-color);
+		    margin: 10px 0;
+		}
+		
+		.stat-card .label {
+		    font-size: 0.9rem;
+		    color: var(--light-text);
+		}
+		
+		/* 响应式调整 - 横屏优化 */
+		@media (min-width: 768px) {
+		    .app-container {
+		        max-width: 768px;
+		        margin: 0 auto;
+		    }
+		    .stats-container {
+		        grid-template-columns: repeat(3, 1fr);
+		    }
+		}
+		
+		/* 横屏模式 */
+		body.landscape {
+		    font-size: 15px;
+		}
+		
+		body.landscape .app-header {
+		    padding: 10px 15px;
+		}
+		
+		body.landscape .card-header {
+		    padding: 10px 12px;
+		}
+		
+		body.landscape .form-control {
+		    padding: 10px 12px;
+		}
+		
+		body.landscape .btn {
+		    padding: 10px 15px;
+		}
+		
+		body.landscape .image-preview {
+		    height: 180px;
+		}
+		
+		body.landscape .table-container {
+		    max-height: 350px;
+		}
+		
+		body.landscape .data-table th, 
+		body.landscape .data-table td {
+		    padding: 10px 12px;
+		}
+		
+		body.landscape .bottom-nav {
+		    padding: 8px 0;
+		}
+		
+		body.landscape .nav-item i {
+		    font-size: 1.2rem;
+		}
+		
+		/* 模态框 */
+		.modal {
+		    display: none;
+		    position: fixed;
+		    top: 0;
+		    left: 0;
+		    right: 0;
+		    bottom: 0;
+		    background: rgba(0, 0, 0, 0.8);
+		    z-index: 2000;
+		    align-items: center;
+		    justify-content: center;
+		    padding: 15px;
+		}
+		
+		.modal.active {
+		    display: flex;
+		}
+		
+		.modal-content {
+		    background: white;
+		    border-radius: 10px;
+		    width: 100%;
+		    max-width: 500px;
+		    max-height: 90vh;
+		    overflow-y: auto;
+		}
+		
+		.modal-header {
+		    padding: 15px;
+		    border-bottom: 1px solid var(--border-color);
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		}
+		
+		.modal-body {
+		    padding: 15px;
+		}
+		
+		.close-modal {
+		    background: none;
+		    border: none;
+		    font-size: 1.5rem;
+		    cursor: pointer;
+		    color: var(--light-text);
+		}
+		
+		/* 筛选区域 */
+		.filter-section {
+		    background: white;
+		    border-radius: 10px;
+		    padding: 15px;
+		    margin-bottom: 20px;
+		    box-shadow: var(--shadow);
+		}
+		
+		.filter-row {
+		    display: flex;
+		    gap: 10px;
+		    margin-bottom: 10px;
+		    flex-wrap: wrap;
+		}
+		
+		.filter-row .form-control {
+		    flex: 1;
+		    min-width: 150px;
+		}
+		
+		/* 日期范围选择器样式 */
+		.date-range-picker {
+		    display: flex;
+		    gap: 10px;
+		    align-items: center;
+		}
+		
+		.date-range-picker select {
+		    flex: 1;
+		    padding: 12px;
+		    border: 1px solid var(--border-color);
+		    border-radius: 8px;
+		}
+		
+		/* 通知 */
+		.notification {
+		    position: fixed;
+		    top: 20px;
+		    right: 20px;
+		    padding: 15px 25px;
+		    border-radius: 8px;
+		    background-color: #28a745;
+		    color: white;
+		    opacity: 0;
+		    transition: opacity 0.3s;
+		    z-index: 1001;
+		    pointer-events: none;
+		}
+		
+		.notification.show {
+		    opacity: 1;
+		}
+		
+		.notification.error {
+		    background-color: #dc3545;
+		}
+		
+		/* 图片放大模态框 */
+		.image-modal {
+		    display: none;
+		    position: fixed;
+		    top: 0;
+		    left: 0;
+		    right: 0;
+		    bottom: 0;
+		    background: rgba(0, 0, 0, 0.9);
+		    z-index: 3000;
+		    align-items: center;
+		    justify-content: center;
+		}
+		
+		.image-modal.active {
+		    display: flex;
+		}
+		
+		.image-modal-content {
+		    max-width: 90%;
+		    max-height: 90%;
+		}
+		
+		.image-modal-content img {
+		    max-width: 100%;
+		    max-height: 100%;
+		    object-fit: contain;
+		    border-radius: 5px;
+		    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+		}
+		
+		.close-image-modal {
+		    position: absolute;
+		    top: 20px;
+		    right: 30px;
+		    color: white;
+		    font-size: 40px;
+		    font-weight: bold;
+		    cursor: pointer;
+		    z-index: 3001;
+		}
+		
+		/* 自动补全下拉框 */
+		.autocomplete-container {
+		    position: relative;
+		}
+		
+		.autocomplete-items {
+		    position: absolute;
+		    border: 1px solid var(--border-color);
+		    border-bottom: none;
+		    border-top: none;
+		    z-index: 99;
+		    top: 100%;
+		    left: 0;
+		    right: 0;
+		    max-height: 200px;
+		    overflow-y: auto;
+		    background: white;
+		    border-radius: 0 0 8px 8px;
+		    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+		}
+		
+		.autocomplete-items div {
+		    padding: 10px;
+		    cursor: pointer;
+		    background-color: white; 
+		    border-bottom: 1px solid var(--border-color); 
+		}
+		
+		.autocomplete-items div:hover {
+		    background-color: #e9e9e9; 
+		}
+		
+		.autocomplete-active {
+		    background-color: var(--primary-color) !important; 
+		    color: white; 
+		}
+		
+		/* 导出按钮样式 */
+		.export-btn-container {
+		    display: flex;
+		    justify-content: flex-end;
+		    margin-top: 15px;
+		}
+		
+		/* 小屏幕调整 */
+		@media (max-width: 600px) {
+		    .filter-row {
+		        flex-direction: column;
+		    }
+		    
+		    .date-range-picker {
+		        flex-direction: column;
+		    }
+		    
+		    .action-cell {
+		        flex-direction: column;
+		    }
+		}
+		
+		/* 新增样式 */
+		
+		/* 数据来源样式 - 移至表格下方 */
+		.data-source {
+		    background-color: #f0f8ff;
+		    padding: 8px 15px;
+		    font-size: 0.85rem;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    border-top: 1px solid #dee2e6;
+		    margin-top: 10px;
+		    border-radius: 0 0 8px 8px;
+		}
+		
+		.data-source i {
+		    margin-right: 8px;
+		    color: #4e73df;
+		}
+		
+		.data-source span {
+		    font-weight: 500;
+		}
+		
+		/* 批量导入区域 - 缩小版 */
+		.batch-import {
+		    background-color: #fff;
+		    border: 1px dashed #4e73df;
+		    border-radius: 8px;
+		    padding: 10px;
+		    margin-top: 10px;
+		    text-align: center;
+		    position: relative;
+		}
+		
+		.batch-import h4 {
+		    margin: 5px 0 10px 0;
+		    font-size: 0.95rem;
+		    color: #4e73df;
+		}
+		
+		.batch-import input[type="file"] {
+		    display: none;
+		}
+		
+		.batch-import label {
+		    display: inline-block;
+		    padding: 8px 12px;
+		    background-color: #eaf2ff;
+		    color: #4e73df;
+		    border-radius: 5px;
+		    cursor: pointer;
+		    margin: 0 3px;
+		    font-size: 0.9rem;
+		}
+		
+		.batch-import button {
+		    margin-top: 8px;
+		    padding: 8px 15px;
+		    font-size: 0.9rem;
+		}
+		
+		.file-name {
+		    font-size: 0.85rem;
+		    margin: 5px 0;
+		    color: #6c757d;
+		}
+		
+		.file-formats {
+		    font-size: 0.75rem;
+		    color: #6c757d;
+		    margin-top: 5px;
+		}
+		
+		/* 汇总行样式 */
+		.summary-row {
+		    background-color: #e9f7ef;
+		    padding: 10px;
+		    border-radius: 5px;
+		    margin-bottom: 15px;
+		    display: flex;
+		    flex-wrap: wrap;
+		    gap: 15px;
+		}
+		
+		.summary-item {
+		    display: flex;
+		    flex-direction: column;
+		}
+		
+		.summary-label {
+		    font-size: 0.8rem;
+		    color: #6c757d;
+		}
+		
+		.summary-value {
+		    font-size: 1rem;
+		    font-weight: bold;
+		    color: #1cc88a;
+		}
+		
+		.export-header-btn {
+		    padding: 8px 12px;
+		    font-size: 0.9rem;
+		}
+		
+		/* 导入按钮组 */
+		.import-btn-group {
+		    display: flex;
+		    gap: 5px;
+		    justify-content: center;
+		    margin-top: 5px;
+		}
+		
+		.import-btn-group label {
+		    flex: 1;
+		}
+		
+		/* 下拉按钮样式 */
+		.input-with-dropdown {
+		    display: flex;
+		    position: relative;
+		}
+		
+		.dropdown-button {
+		    position: absolute;
+		    right: 10px;
+		    top: 50%;
+		    transform: translateY(-50%);
+		    background: none;
+		    border: none;
+		    color: var(--light-text);
+		    cursor: pointer;
+		    z-index: 10;
+		}
+		
+		.autocomplete-container .form-control {
+		    padding-right: 40px;
+		}
+		
+		/* 折叠面板样式 */
+		.collapsible-section {
+		    margin-bottom: 15px;
+		}
+		
+		.collapsible-header {
+		    background-color: var(--header-color);
+		    padding: 10px 15px;
+		    font-weight: 600;
+		    border-radius: 8px;
+		    cursor: pointer;
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    border: 1px solid var(--border-color);
+		}
+		
+		.collapsible-header i {
+		    transition: transform 0.3s;
+		}
+		
+		.collapsible-header.expanded i {
+		    transform: rotate(180deg);
+		}
+		
+		.collapsible-content {
+		    max-height: 0;
+		    overflow: hidden;
+		    transition: max-height 0.3s ease, padding 0.3s ease;
+		}
+		
+		.collapsible-content.expanded {
+		    max-height: 1000px; /* 足够大的值以容纳内容 */
+		    padding: 15px 0;
+		}
+		
+		/* 新增：SKU选择区 */
+		.sku-selector {
+		    display: none;
+		    margin-top: 10px;
+		    padding: 10px;
+		    background-color: #f8f9fa;
+		    border-radius: 8px;
+		    border: 1px solid #dee2e6;
+		}
+		
+		.sku-selector.active {
+		    display: block;
+		    animation: fadeIn 0.3s ease;
+		}
+		
+		.sku-options {
+		    display: flex;
+		    flex-wrap: wrap;
+		    gap: 8px;
+		    margin-top: 10px;
+		}
+		
+		.sku-option {
+		    padding: 8px 12px;
+		    background-color: white;
+		    border: 1px solid #dee2e6;
+		    border-radius: 4px;
+		    cursor: pointer;
+		    transition: all 0.2s;
+		}
+		
+		.sku-option:hover {
+		    background-color: #e9ecef;
+		}
+		
+		.sku-option.selected {
+		    background-color: var(--primary-color);
+		    color: white;
+		    border-color: var(--primary-color);
+		}
+		
+		.sku-selector-header {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    margin-bottom: 8px;
+		}
+		
+		.close-sku-selector {
+		    background: none;
+		    border: none;
+		    color: #6c757d;
+		    cursor: pointer;
+		}
+		
+		/* 图片编辑区域 */
+		.image-edit-group {
+		    margin-bottom: 15px;
+		}
+		
+		/* 新增：响应式布局优化 */
+		@media (max-width: 767px) {
+		    :root {
+		        --base-font-size: 14px;
+		    }
+		    
+		    .app-header h1 {
+		        font-size: 1.1rem;
+		    }
+		    
+		    /*.card-header {
+		        flex-direction: column; 弹性方向列
+		        align-items: flex-start;
+		    }*/
+		    
+		    .input-group {
+		        flex-direction: column;
+		    }
+		    
+		    .cost-input {
+		        width: 100%;
+		    }
+		    
+		    .btn-group {
+		        flex-direction: column;
+		    }
+		    
+		    .btn-group .btn {
+		        width: 100%;
+		    }
+		    
+		    .summary-row {
+		        flex-direction: column;
+		        gap: 8px;
+		    }
+		    
+		    .table-container {
+		        max-height: 300px;
+		    }
+		    
+		    .data-table th, .data-table td {
+		        padding: 8px 10px;
+		        font-size: 0.8rem;
+		    }
+		    
+		    .thumbnail {
+		        width: 40px;
+		        height: 40px;
+		    }
+		    
+		    .action-cell {
+		        flex-direction: column;
+		        gap: 3px;
+		    }
+		    
+		    .action-btn {
+		        font-size: 0.75rem;
+		        padding: 4px 8px;
+		    }
+		    
+		    .bottom-nav {
+		        padding: 8px 0;
+		    }
+		    
+		    .nav-item i {
+		        font-size: 1.1rem;
+		    }
+		    
+		    .nav-item span {
+		        font-size: 0.7rem;
+		    }
+		}
+		
+		@media (min-width: 768px) and (max-width: 1023px) {
+		    :root {
+		        --base-font-size: 15px;
+		    }
+		    
+		    .app-container {
+		        max-width: 768px;
+		    }
+		    
+		    .responsive-layout {
+		        display: flex;
+		        flex-wrap: wrap;
+		        gap: 15px;
+		    }
+		    
+		    .responsive-col {
+		        flex: 1;
+		        min-width: 300px;
+		    }
+		    
+		    .image-preview {
+		        height: 180px;
+		    }
+		}
+		
+		@media (min-width: 1024px) {
+		    .app-container {
+		        max-width: 1024px;
+		    }
+		    
+		    .responsive-layout {
+		        display: flex;
+		        gap: 20px;
+		    }
+		    
+		    .responsive-col {
+		        flex: 1;
+		    }
+		}
+		
+		/* 新增手动横屏切换按钮样式 */
+		.orientation-toggle {
+		    position: fixed;
+		    top: 10px;
+		    right: 10px;
+		    background: rgba(0, 0, 0, 0.7);
+		    color: white;
+		    padding: 8px 15px;
+		    border-radius: 20px;
+		    font-size: 0.85rem;
+		    z-index: 1000;
+		    display: flex;
+		    align-items: center;
+		    gap: 5px;
+		    cursor: pointer;
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		}
+		
+		.orientation-toggle i {
+		    transition: transform 0.3s;
+		}
+		
+		body.landscape .orientation-toggle i {
+		    transform: rotate(90deg);
+		}
+		
+		/* 文件路径显示 - 修复溢出问题 */
+		.storage-path {
+		    background-color: #e9f7ff;
+		    padding: 10px 15px;
+		    border-radius: 8px;
+		    margin: 10px 0;
+		    font-size: 0.85rem;
+		    display: flex;
+		    flex-wrap: wrap; /* 允许换行 */
+		    align-items: center;
+		    justify-content: space-between;
+		    gap: 10px;
+		    word-break: break-all; /* 允许长单词换行 */
+		}
+		
+		.path-info {
+		    flex: 1;
+		    min-width: 100%; /* 在小屏幕上占满整行 */
+		    margin-bottom: 10px; /* 添加底部间距 */
+		}
+		
+		.path-actions {
+		    display: flex;
+		    gap: 5px;
+		    justify-content: flex-end; /* 按钮右对齐 */
+		    width: 100%; /* 在小屏幕上占满整行 */
+		}
+		
+		.storage-path i {
+		    color: #4e73df;
+		    margin-right: 8px;
+		}
+		
+		.path-btn {
+		    padding: 6px 10px;
+		    background-color: #4e73df;
+		    color: white;
+		    border: none;
+		    border-radius: 4px;
+		    font-size: 0.8rem;
+		    cursor: pointer;
+		}
+		
+		.path-btn:hover {
+		    background-color: #2e59d9;
+		}
+		
+		.path-btn-warning {
+		    background-color: #f6c23e;
+		    color: #212529;
+		}
+		
+		.path-btn-warning:hover {
+		    background-color: #e4b30d;
+		}
+		
+		/* 在较大屏幕上调整布局 */
+		@media (min-width: 768px) {
+		    .path-info {
+		        min-width: auto; /* 恢复默认宽度 */
+		        margin-bottom: 0; /* 移除底部间距 */
+		        flex: 1;
+		    }
+		    .path-actions {
+		        width: auto; /* 恢复默认宽度 */
+		    }
+		}
+		
+		/* 存储路径折叠区域 */
+		#storage-path-content {
+		    display: none;
+		}
+		
+		#storage-path-header.expanded + #storage-path-content {
+		    display: block;
+		}
+		
+		/* 新增：使用须知弹窗样式 */
+		.notice-modal {
+		    display: none;
+		    position: fixed;
+		    top: 0;
+		    left: 0;
+		    right: 0;
+		    bottom: 0;
+		    background: rgba(0, 0, 0, 0.8);
+		    z-index: 4000;
+		    align-items: center;
+		    justify-content: center;
+		    padding: 15px;
+		}
+		
+		.notice-modal.active {
+		    display: flex;
+		    animation: fadeIn 0.5s ease;
+		}
+		
+		@keyframes fadeIn {
+		    from { opacity: 0; }
+		    to { opacity: 1; }
+		}
+		
+		.notice-content {
+		    background: white;
+		    border-radius: 12px;
+		    width: 100%;
+		    max-width: 500px;
+		    max-height: 90vh;
+		    overflow-y: auto;
+		    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+		}
+		
+		.notice-header {
+		    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+		    color: white;
+		    padding: 20px;
+		    text-align: center;
+		    border-radius: 12px 12px 0 0;
+		    position: relative;
+		}
+		
+		.notice-header h2 {
+		    font-size: 1.5rem;
+		    margin-bottom: 10px;
+		}
+		
+		.notice-header i {
+		    font-size: 2.5rem;
+		    margin-bottom: 15px;
+		    color: white;
+		    display: block;
+		}
+		
+		.notice-body {
+		    padding: 25px;
+		    font-size: 0.95rem;
+		    line-height: 1.8;
+		}
+		
+		.notice-list {
+		    margin: 15px 0;
+		    padding-left: 20px;
+		}
+		
+		.notice-list li {
+		    margin-bottom: 12px;
+		}
+		
+		.notice-footer {
+		    padding: 20px;
+		    text-align: center;
+		    border-top: 1px solid var(--border-color);
+		}
+		
+		.countdown {
+		    font-size: 1.2rem;
+		    font-weight: bold;
+		    color: var(--danger-color);
+		    margin: 15px 0;
+		    min-height: 30px;
+		}
+		
+		.close-notice {
+		    background-color: var(--primary-color);
+		    color: white;
+		    border: none;
+		    border-radius: 8px;
+		    padding: 12px 25px;
+		    font-size: 1rem;
+		    font-weight: 600;
+		    cursor: pointer;
+		    transition: background-color 0.3s;
+		    display: none; /* 默认隐藏 */
+		}
+		
+		.close-notice.active {
+		    display: inline-block;
+		    animation: fadeIn 0.5s ease;
+		}
+		
+		.close-notice:hover {
+		    background-color: #2e59d9;
+		}
+	</style>
+</head>
+<body>
+    <!-- 使用须知弹窗 -->
+    <div class="notice-modal" id="notice-modal">
+        <div class="notice-content">
+            <div class="notice-header">
+                <i class="fas fa-info-circle"></i>
+                <h2>使用须知</h2>
+                <p>请仔细阅读以下重要信息</p>
+            </div>
+            <div class="notice-body">
+                <ul class="notice-list">
+                    <li>本软件基于web应用编写</li>
+                    <li>本应用采用本地存储技术</li>
+                    <li>由于web应用技术限制，软件数据建议您养成经常导出表格到本地备份，以免系统清理造成数据丢失</li>
+                    <li>软件卸载前记得导出商品数据和订单数据备份，否则一但卸载数据将一同清理</li>
+                    <li>本软件仅供学习交流，未经作者允许，盗用必究</li>
+                </ul>
+                <p class="text-center"><i class="fas fa-exclamation-triangle text-warning"></i> 请务必定期备份数据 <i class="fas fa-exclamation-triangle text-warning"></i></p>
+            </div>
+            <div class="notice-footer">
+                <div class="countdown" id="countdown">5</div>
+                <button class="close-notice" id="close-notice">我已知晓，关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="orientation-toggle" id="orientation-toggle">
+        <i class="fas fa-mobile-alt"></i>
+        <span id="orientation-text">横</span>
+    </div>
+    
+    <div class="app-container">
+        <!-- 应用头部 -->
+        <header class="app-header">
+            <h1>电商产品及订单管理系统 v17.8</h1>
+            <p>版本号：v17.8.5.6.27.06 | kevin自研 盗用必究</p>
+        </header>
+        
+        <!-- 标签内容 - 默认显示订单页面 -->
+        <div class="tab-content" id="goods-content">
+            <!-- 商品信息录入 -->
+            <div class="card">
+                <div class="card-header">
+                    <span>商品信息录入</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-group autocomplete-container">
+                        <label for="product-name">商品名称</label>
+                        <div class="input-with-dropdown">
+                            <input type="text" id="product-name" class="form-control" placeholder="输入商品名称" autocomplete="off">
+                            <button class="dropdown-button" data-target="product-autocomplete">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div id="product-autocomplete" class="autocomplete-items"></div>
+                    </div>
+                    <div class="form-group autocomplete-container">
+                        <label for="sku-name">SKU名称/规格</label>
+                        <div class="input-with-dropdown">
+                            <input type="text" id="sku-name" class="form-control" placeholder="输入SKU名称/规格" autocomplete="off">
+                            <button class="dropdown-button" data-target="sku-autocomplete">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div id="sku-autocomplete" class="autocomplete-items"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-note">备注</label>
+                        <input type="text" id="product-note" class="form-control" placeholder="输入备注">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-image">SKU图片URL</label>
+                        <input type="text" id="product-image" class="form-control" placeholder="输入图片URL">
+                    </div>
+                    <div class="form-group">
+                        <label>成本信息</label>
+                        <div class="input-group">
+                            <div class="cost-input">
+                                <label>成本</label>
+                                <input type="number" class="form-control cost-cost" placeholder="成本" value="0">
+                            </div>
+                            <div class="cost-input">
+                                <label>运费</label>
+                                <input type="number" class="form-control cost-shipping" placeholder="运费" value="0">
+                            </div>
+                            <div class="cost-input">
+                                <label>其他费用</label>
+                                <input type="number" class="form-control cost-other" placeholder="其他费用" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>总计成本</label>
+                        <div class="stat-card">
+                            <div class="value" id="total-cost">¥ 0.00</div>
+                        </div>
+                    </div>
+                    <div class="image-preview" id="product-image-preview">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <p>图片预览区域</p>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-success" id="submit-product">
+                            <i class="fas fa-save"></i> 提交录入
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 商品批量导入 - 折叠版 -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" id="goods-import-header">
+                    <span>批量导入商品数据</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="collapsible-content" id="goods-import-content">
+                    <div class="batch-import">
+                        <div class="import-btn-group">
+                            <label class="btn btn-info" id="import-goods-excel-btn">
+                                <i class="fas fa-file-excel"></i> Excel
+                            </label>
+                            <label class="btn btn-warning" id="import-goods-json-btn">
+                                <i class="fas fa-file-code"></i> JSON
+                            </label>
+                        </div>
+                        <div class="file-name" id="goods-file-name">未选择文件</div>
+                        <div class="file-formats">支持 .xlsx 和 .json 格式</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 商品筛选 - 折叠版 -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" id="goods-filter-header">
+                    <span>商品筛选</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="collapsible-content" id="goods-filter-content">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="filter-row">
+                                <select class="form-control" id="filter-field">
+                                    <option value="productName">商品名称</option>
+                                    <option value="skuName">SKU名称/规格</option>
+                                </select>
+                                <input type="text" class="form-control" id="filter-value" placeholder="输入筛选条件">
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn" id="apply-filter">
+                                    <i class="fas fa-filter"></i> 筛选
+                                </button>
+                                <button class="btn btn-warning" id="clear-filter">
+                                    <i class="fas fa-sync"></i> 全部
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 商品列表 -->
+            <div class="card">
+                <div class="card-header">
+                    <span>商品信息预览</span>
+                    <span id="goods-count">共 0 条记录</span>
+                    <button class="btn btn-info export-header-btn" id="export-goods"><i class="fas fa-file-excel"></i> 导出数据</button>
+                    <!-- <button class="btn btn-info" id="open-download-dir" title="打开导出目录" style="padding: 10px;">
+                        <i class="fas fa-folder-open"></i>-->
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>商品名称</th>
+                                    <th>SKU名称/规格</th>
+                                    <th>图片</th>
+                                    <th>成本</th>
+                                    <th>运费</th>
+                                    <th>其他费用</th>
+                                    <th>总成本</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="goods-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- 数据来源路径 -->
+                    <div class="data-source">
+                        <i class="fas fa-database"></i>
+                        <span id="goods-data-source">数据来源：<strong>浏览器本地存储</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 订单管理内容 - 默认激活 -->
+        <div class="tab-content active" id="orders-content">
+            <!-- 订单信息录入 -->
+            <div class="card">
+                <div class="card-header">
+                    <span>订单信息录入</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-group autocomplete-container">
+                        <label for="order-platform">平台</label>
+                        <div class="input-with-dropdown">
+                            <input type="text" id="order-platform" class="form-control" placeholder="输入平台名称" autocomplete="off">
+                            <button class="dropdown-button" data-target="platform-autocomplete">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div id="platform-autocomplete" class="autocomplete-items"></div>
+                    </div>
+                    <div class="form-group autocomplete-container">
+                        <label for="order-shop">店铺名</label>
+                        <div class="input-with-dropdown">
+                            <input type="text" id="order-shop" class="form-control" placeholder="输入店铺名" autocomplete="off">
+                            <button class="dropdown-button" data-target="shop-autocomplete">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div id="shop-autocomplete" class="autocomplete-items"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-date">订单日期</label>
+                        <input type="date" id="order-date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="order-id">订单号</label>
+                        <input type="text" id="order-id" class="form-control" placeholder="输入订单号">
+                    </div>
+                    
+                    <!-- 商品选择区域 -->
+                    <div class="form-group autocomplete-container">
+                        <label for="order-product">商品名称</label>
+                        <div class="input-with-dropdown">
+                            <input type="text" id="order-product" class="form-control" placeholder="输入商品名称" autocomplete="off">
+                            <button class="dropdown-button" data-target="product-order-autocomplete">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div id="product-order-autocomplete" class="autocomplete-items"></div>
+                    </div>
+                    
+                    <!-- SKU选择区域 -->
+                    <div class="form-group">
+                        <label for="order-sku">SKU名称/规格</label>
+                        <div class="input-group">
+                            <input type="text" id="order-sku" class="form-control" placeholder="请先选择商品" readonly>
+                            <button class="btn btn-primary" id="select-sku-btn">
+                                <i class="fas fa-list"></i> 选择SKU
+                            </button>
+                        </div>
+                        
+                        <!-- SKU选择器 -->
+                        <div class="sku-selector" id="sku-selector">
+                            <div class="sku-selector-header">
+                                <h4>选择SKU</h4>
+                                <button class="close-sku-selector" id="close-sku-selector">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <p>请为商品 <span id="current-product-name" class="text-primary"></span> 选择SKU：</p>
+                            <div class="sku-options" id="sku-options">
+                                <!-- SKU选项将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="order-image">图片URL</label>
+                        <input type="text" id="order-image" class="form-control" placeholder="输入图片URL">
+                    </div>
+                    <div class="image-preview" id="order-image-preview">
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <p>订单图片预览区域</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-paid">订单实付款</label>
+                        <input type="number" id="order-paid" class="form-control" placeholder="输入金额" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>成本信息</label>
+                        <div class="input-group">
+                            <div class="cost-input">
+                                <label>产品成本</label>
+                                <input type="number" class="form-control order-cost-cost" placeholder="产品成本" value="0" readonly>
+                            </div>
+                            <div class="cost-input">
+                                <label>运费</label>
+                                <input type="number" class="form-control order-cost-shipping" placeholder="运费" value="0">
+                            </div>
+                            <div class="cost-input">
+                                <label>打包费</label>
+                                <input type="number" class="form-control order-cost-packing" placeholder="打包费" value="0">
+                            </div>
+                            <div class="cost-input">
+                                <label>其他费用</label>
+                                <input type="number" class="form-control order-cost-other" placeholder="其他费用" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="label">产品总成本</div>
+                            <div class="value" id="order-total-cost">¥ 0.00</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">利润</div>
+                            <div class="value" id="order-profit">¥ 0.00</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="courier">快递公司</label>
+                        <input type="text" id="courier" class="form-control" placeholder="输入快递公司">
+                    </div>
+                    <div class="form-group">
+                        <label for="tracking">快递单号</label>
+                        <input type="text" id="tracking" class="form-control" placeholder="输入快递单号">
+                    </div>
+                    <div class="form-group">
+                        <label for="order-note">备注</label>
+                        <textarea id="order-note" class="form-control" rows="2" placeholder="输入备注"></textarea>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-success" id="submit-order">
+                            <i class="fas fa-save"></i> 提交订单
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 订单批量导入 - 折叠版 -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" id="orders-import-header">
+                    <span>批量导入订单数据</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="collapsible-content" id="orders-import-content">
+                    <div class="batch-import">
+                        <div class="import-btn-group">
+                            <label class="btn btn-info" id="import-orders-excel-btn">
+                                <i class="fas fa-file-excel"></i> Excel
+                            </label>
+                            <label class="btn btn-warning" id="import-orders-json-btn">
+                                <i class="fas fa-file-code"></i> JSON
+                            </label>
+                        </div>
+                        <div class="file-name" id="orders-file-name">未选择文件</div>
+                        <div class="file-formats">支持 .xlsx 和 .json 格式</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 订单筛选 - 折叠版 -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" id="orders-filter-header">
+                    <span>订单筛选</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="collapsible-content" id="orders-filter-content">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="filter-row">
+                                <select class="form-control" id="order-filter-field">
+                                    <option value="platform">平台</option>
+                                    <option value="shop">店铺名</option>
+                                    <option value="id">订单号</option>
+                                    <option value="productName">商品名称</option>
+                                    <option value="skuName">SKU名称/规格</option>
+                                    <option value="courier">快递公司</option>
+                                    <option value="tracking">快递单号</option>
+                                </select>
+                                <input type="text" class="form-control" id="order-filter-value" placeholder="输入筛选条件">
+                            </div>
+                            <div class="filter-row">
+                                <div class="date-range-picker">
+                                    <select class="form-control" id="date-range">
+                                        <option value="">选择时间范围</option>
+                                        <option value="7">近7天</option>
+                                        <option value="10">近10天</option>
+                                        <option value="30">近30天</option>
+                                        <option value="custom">自定义日期</option>
+                                    </select>
+                                    <input type="date" id="start-date" class="form-control" style="display:none;">
+                                    <input type="date" id="end-date" class="form-control" style="display:none;">
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn" id="apply-order-filter">
+                                    <i class="fas fa-filter"></i> 筛选
+                                </button>
+                                <button class="btn btn-warning" id="clear-order-filter">
+                                    <i class="fas fa-sync"></i> 全部
+                                </button>
+                                <button class="btn btn-info" id="export-orders"><i class="fas fa-file-excel"></i> 导出数据</button>
+                                <!--  <button class="btn btn-info" id="open-download-dir" title="打开导出目录" style="padding: 10px;">
+                                    <i class="fas fa-folder-open"></i>-->
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 汇总信息 -->
+            <div class="summary-row">
+                <!-- 新增：实付款总和 -->
+                <div class="summary-item">
+                    <span class="summary-label">实付款总和</span>
+                    <span class="summary-value" id="total-paid-sum">¥0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">产品成本总和</span>
+                    <span class="summary-value" id="total-cost-sum">¥0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">运费总和</span>
+                    <span class="summary-value" id="total-shipping-sum">¥0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">打包费总和</span>
+                    <span class="summary-value" id="total-packing-sum">¥0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">其他费用总和</span>
+                    <span class="summary-value" id="total-other-sum">¥0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">总成本总和</span>
+                    <span class="summary-value" id="total-all-cost-sum">¥0.00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">利润总和</span>
+                    <span class="summary-value" id="total-profit-sum">¥0.00</span>
+                </div>
+            </div>
+            
+            <!-- 订单列表 -->
+            <div class="card">
+                <div class="card-header">
+                    <span>订单信息预览</span>
+                    <span id="orders-count">共 0 条记录</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>平台</th>
+                                    <th>店铺名</th>
+                                    <th>订单日期</th>
+                                    <th>订单号</th>
+                                    <th>商品名称</th>
+                                    <th>SKU名称/规格</th>
+                                    <th>SKU图片</th>
+                                    <th>实付款</th>
+                                    <th>产品成本</th>
+                                    <th>运费</th>
+                                    <th>打包费</th>
+                                    <th>其他费用</th>
+                                    <th>总成本</th>
+                                    <th>利润</th>
+                                    <th>快递公司</th>
+                                    <th>快递单号</th>
+                                    <th>备注</th> <!-- 新增备注列 -->
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body">
+                                <!-- 订单数据将通过JavaScript动态生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- 数据来源路径 -->
+                    <div class="data-source">
+                        <i class="fas fa-database"></i>
+                        <span id="orders-data-source">数据来源：<strong>浏览器本地存储</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航 - 默认激活订单页 -->
+    <div class="bottom-nav">
+        <div class="nav-item" data-tab="goods">
+            <i class="fas fa-box"></i>
+            <span>商品</span>
+        </div>
+        <div class="nav-item active" data-tab="orders">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <span>订单</span>
+        </div>
+        <!-- 刷新按钮功能修正 -->
+        <div class="nav-item" id="refresh-btn">
+            <i class="fas fa-sync-alt"></i>
+            <span>刷新</span>
+        </div>
+    </div>
+
+    <!-- 编辑商品模态框 -->
+    <div class="modal" id="edit-product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑商品信息</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 模态框内容 -->
+                <div class="form-group">
+                    <label for="edit-product-name">商品名称</label>
+                    <input type="text" id="edit-product-name" class="form-control" value="时尚运动鞋">
+                </div>
+                <div class="form-group">
+                    <label for="edit-sku-name">SKU名称/规格</label>
+                    <input type="text" id="edit-sku-name" class="form-control" value="黑色42码">
+                </div>
+                
+                <!-- 新增：图片编辑区域 -->
+                <div class="image-edit-group">
+                    <label for="edit-product-image">商品图片URL</label>
+                    <input type="text" id="edit-product-image" class="form-control" placeholder="输入图片URL">
+                </div>
+                
+                <div class="image-preview" style="height: 150px;" id="edit-image-preview">
+                    <div class="image-placeholder">
+                        <i class="fas fa-image"></i>
+                        <p>商品图片预览</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-cost">成本</label>
+                    <input type="number" id="edit-cost" class="form-control" value="120.00">
+                </div>
+                <div class="form-group">
+                    <label for="edit-shipping">运费</label>
+                    <input type="number" id="edit-shipping" class="form-control" value="15.00">
+                </div>
+                <div class="form-group">
+                    <label for="edit-other">其他费用</label>
+                    <input type="number" id="edit-other" class="form-control" value="5.00">
+                </div>
+                <div class="form-group">
+                    <label for="edit-note">备注</label>
+                    <textarea id="edit-note" class="form-control" rows="2">热销款，库存充足</textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success" id="save-edit">保存修改</button>
+                    <button class="btn btn-warning close-modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑订单模态框 -->
+    <div class="modal" id="edit-order-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑订单信息</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 模态框内容 -->
+                <div class="form-group">
+                    <label for="edit-order-platform">平台</label>
+                    <input type="text" id="edit-order-platform" class="form-control" value="淘宝">
+                </div>
+                <div class="form-group">
+                    <label for="edit-order-shop">店铺名</label>
+                    <input type="text" id="edit-order-shop" class="form-control" value="旗舰店">
+                </div>
+                <div class="form-group">
+                    <label for="edit-order-date">订单日期</label>
+                    <input type="date" id="edit-order-date" class="form-control" value="2023-10-15">
+                </div>
+                <div class="form-group">
+                    <label for="edit-order-id">订单号</label>
+                    <input type="text" id="edit-order-id" class="form-control" value="TB20231015001">
+                </div>
+                <div class="form-group">
+                    <label for="edit-order-product">商品名称</label>
+                    <input type="text" id="edit-order-product" class="form-control" value="时尚运动鞋">
+                </div>
+                <div class="form-group">
+                    <label for="edit-order-sku">SKU名称/规格</label>
+                    <input type="text" id="edit-order-sku" class="form-control" value="黑色42码">
+                </div>
+                <div class="form-group">
+                    <label for="edit-order-paid">订单实付款</label>
+                    <input type="number" id="edit-order-paid" class="form-control" value="320.00">
+                </div>
+                <div class="form-group">
+                    <label>成本信息</label>
+                    <div class="input-group">
+                        <div class="cost-input">
+                            <label>产品成本</label>
+                            <input type="number" class="form-control edit-order-cost-cost" placeholder="产品成本" value="120.00">
+                        </div>
+                        <div class="cost-input">
+                            <label>运费</label>
+                            <input type="number" class="form-control edit-order-cost-shipping" placeholder="运费" value="15.00">
+                        </div>
+                        <div class="cost-input">
+                            <label>打包费</label>
+                            <input type="number" class="form-control edit-order-cost-packing" placeholder="打包费" value="5.00">
+                        </div>
+                        <div class="cost-input">
+                            <label>其他费用</label>
+                            <input type="number" class="form-control edit-order-cost-other" placeholder="其他费用" value="5.00">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-courier">快递公司</label>
+                    <input type="text" id="edit-courier" class="form-control" value="顺丰速运">
+                </div>
+                <div class="form-group">
+                    <label for="edit-tracking">快递单号</label>
+                    <input type="text" id="edit-tracking" class="form-control" value="SF123456789">
+                </div>
+                <div class="form-group">
+                    <label for="edit-order-note">备注</label>
+                    <textarea id="edit-order-note" class="form-control" rows="2">客户要求尽快发货</textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success" id="save-order-edit">保存修改</button>
+                    <button class="btn btn-warning close-modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 图片放大模态框 -->
+    <div class="image-modal" id="image-modal">
+        <span class="close-image-modal">&times;</span>
+        <div class="image-modal-content">
+            <img id="expanded-image" src="" alt="放大图片">
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+    
+    
+        <script>
+    		// 使用localStorage存储数据
+            const PRODUCTS_KEY = "ecommerce_goods_data";
+            const ORDERS_KEY = "ecommerce_orders_data";
+            const ORIENTATION_KEY = 'ecommerce-orientation';
+            const BACKUP_KEY = "ecommerce_backup_data";
+            
+            // 初始化数据
+            let products = [];
+            let orders = [];
+            let currentSelectedProduct = null;
+            let isDataLoaded = false;
+            
+            // 加载数据
+            function loadData() {
+                try {
+                    // 从localStorage加载商品数据
+                    const productsData = localStorage.getItem(PRODUCTS_KEY);
+                    products = productsData ? JSON.parse(productsData) : [];
+                    
+                    // 从localStorage加载订单数据
+                    const ordersData = localStorage.getItem(ORDERS_KEY);
+                    orders = ordersData ? JSON.parse(ordersData) : [];
+                    
+                    // 尝试从备份恢复数据
+                    const backupData = localStorage.getItem(BACKUP_KEY);
+                    if (backupData) {
+                        try {
+                            const backup = JSON.parse(backupData);
+                            if (products.length === 0 && backup.products) {
+                                products = backup.products;
+                            }
+                            if (orders.length === 0 && backup.orders) {
+                                orders = backup.orders;
+                            }
+                        } catch (e) {
+                            console.error('恢复备份失败:', e);
+                        }
+                    }
+                    
+                    // 更新数据来源显示
+                    document.getElementById('goods-data-source').innerHTML = `
+                        <strong>浏览器本地存储 (${products.length}条记录)</strong>
+                    `;
+                    
+                    document.getElementById('orders-data-source').innerHTML = `
+                        <strong>浏览器本地存储 (${orders.length}条记录)</strong>
+                    `;
+                    
+                    isDataLoaded = true;
+                    return true;
+                } catch (e) {
+                    console.error('加载数据失败:', e);
+                    // 设置默认数据
+                    products = [];
+                    orders = [];
+                    
+                    document.getElementById('goods-data-source').innerHTML = `
+                        <strong>浏览器本地存储 (0条记录)</strong>
+                    `;
+                    
+                    document.getElementById('orders-data-source').innerHTML = `
+                        <strong>浏览器本地存储 (0条记录)</strong>
+                    `;
+                    
+                    isDataLoaded = false;
+                    return false;
+                }
+            }
+    
+            // 保存数据到本地
+            function saveData() {
+                try {
+                    // 保存商品数据
+                    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+                    
+                    // 保存订单数据
+                    localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+                    
+                    // 创建数据备份
+                    createBackup();
+                    
+                    // 更新数据来源显示
+                    document.getElementById('goods-data-source').innerHTML = `
+                        <strong>浏览器本地存储 (${products.length}条记录)</strong>
+                    `;
+                    
+                    document.getElementById('orders-data-source').innerHTML = `
+                        <strong>浏览器本地存储 (${orders.length}条记录)</strong>
+                    `;
+                    
+                    return true;
+                } catch (e) {
+                    console.error('保存数据失败:', e);
+                    showNotification('保存数据失败: ' + e.message, true);
+                    return false;
+                }
+            }
+            
+            // 创建数据备份
+            function createBackup() {
+                try {
+                    const backupData = {
+                        timestamp: new Date().toISOString(),
+                        products: products,
+                        orders: orders
+                    };
+                    localStorage.setItem(BACKUP_KEY, JSON.stringify(backupData));
+                    console.log('数据备份已创建');
+                } catch (e) {
+                    console.error('创建备份失败:', e);
+                }
+            }
+            
+            // 生成文件名时间戳
+            function getTimestamp() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                return `${year}${month}${day}_${hours}${minutes}${seconds}`;
+            }
+            
+            // 导出数据到Excel - 兼容安卓14的解决方案
+            function exportToExcel(data, fileName) {
+                try {
+                    // 创建工作簿
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.json_to_sheet(data);
+                    XLSX.utils.book_append_sheet(wb, ws, "数据");
+                    
+                    // 生成Excel文件
+                    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+                    
+                    // 将二进制数据转换为Blob
+                    const buffer = new ArrayBuffer(wbout.length);
+                    const view = new Uint8Array(buffer);
+                    for (let i = 0; i < wbout.length; i++) {
+                        view[i] = wbout.charCodeAt(i) & 0xFF;
+                    }
+                    
+                    // 检查是否在5+环境
+                    if (typeof plus !== 'undefined') {
+                        // 5+环境：使用文件系统API保存
+                        saveToFileSystem(buffer, fileName, (filePath) => {
+                            showNotification(`文件保存成功: ${filePath}`);
+                            
+                            // 延迟500毫秒弹出确认框
+                            setTimeout(() => {
+                                if (confirm(`文件已保存到应用私有目录\n是否立即查看？`)) {
+                                    // 使用5+的打开文件功能
+                                    plus.runtime.openFile(filePath, {}, function() {
+                                        console.log('打开成功');
+                                    }, function(e) {
+                                        showNotification('打开文件失败: ' + e.message, true);
+                                    });
+                                }
+                            }, 500);
+                        }, (error) => {
+                            showNotification('文件保存失败: ' + error.message, true);
+                        });
+                    } else {
+                        // 非5+环境：使用Blob下载
+                        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = fileName;
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        setTimeout(() => {
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(link.href);
+                        }, 100);
+                        showNotification('文件已开始下载');
+                    }
+                    
+                    return true;
+                } catch (err) {
+                    console.error('导出失败:', err);
+                    showNotification('导出失败: ' + err.message, true);
+                    return false;
+                }
+            }
+            
+            // 5+环境下保存文件到文件系统
+            function saveToFileSystem(buffer, fileName, onSuccess, onError) {
+                // 获取应用私有文档目录
+                const targetDir = '_doc/';
+                const filePath = targetDir + fileName;
+                
+                plus.io.requestFileSystem(plus.io.PRIVATE_DOC, function(fs) {
+                    fs.root.getFile(filePath, { create: true }, function(fileEntry) {
+                        fileEntry.createWriter(function(writer) {
+                            writer.onwrite = function(evt) {
+                                // 保存成功，返回文件路径
+                                onSuccess && onSuccess(fileEntry.toLocalURL());
+                            };
+                            writer.onerror = function(evt) {
+                                onError && onError(new Error('文件写入失败'));
+                            };
+                            
+                            // 创建Blob对象
+                            const blob = new Blob([buffer]);
+                            writer.write(blob);
+                        }, function(e) {
+                            onError && onError(new Error('创建写入器失败: ' + e.message));
+                        });
+                    }, function(e) {
+                        onError && onError(new Error('创建文件失败: ' + e.message));
+                    });
+                }, function(e) {
+                    onError && onError(new Error('请求文件系统失败: ' + e.message));
+                });
+            }
+            
+            // 导出商品数据
+            function exportGoodsData() {
+                if (products.length === 0) {
+                    showNotification('没有可导出的商品数据', true);
+                    return;
+                }
+                
+                const exportData = products.map(product => ({
+                    '商品名称': product.productName,
+                    'SKU名称/规格': product.skuName,
+                    '成本': product.cost,
+                    '运费': product.shipping,
+                    '其他费用': product.other,
+                    '总成本': (product.cost + product.shipping + product.other).toFixed(2),
+                    '图片URL': product.imageUrl || '',
+                    '备注': product.note || ''
+                }));
+                
+                // 添加汇总行
+                const totalCost = products.reduce((sum, p) => sum + p.cost, 0);
+                const totalShipping = products.reduce((sum, p) => sum + p.shipping, 0);
+                const totalOther = products.reduce((sum, p) => sum + p.other, 0);
+                const totalAll = totalCost + totalShipping + totalOther;
+                
+                exportData.push({});
+                exportData.push({
+                    '商品名称': '汇总',
+                    '成本': totalCost.toFixed(2),
+                    '运费': totalShipping.toFixed(2),
+                    '其他费用': totalOther.toFixed(2),
+                    '总成本': totalAll.toFixed(2)
+                });
+                
+                // 导出数据
+                const fileName = `商品数据_${getTimestamp()}.xlsx`;
+                
+                if (exportToExcel(exportData, fileName)) {
+                    showNotification('商品数据导出成功');
+                }
+            }
+            
+            // 导出订单数据
+            function exportOrdersData() {
+                if (orders.length === 0) {
+                    showNotification('没有可导出的订单数据', true);
+                    return;
+                }
+                
+                const exportData = orders.map(order => ({
+                    '平台': order.platform,
+                    '店铺名': order.shop,
+                    '订单日期': order.date,
+                    '订单号': order.id,
+                    '商品名称': order.productName,
+                    'SKU名称/规格': order.skuName,
+                    '实付款': order.paid,
+                    '产品成本': order.cost,
+                    '运费': order.shipping,
+                    '打包费': order.packing,
+                    '其他费用': order.other,
+                    '总成本': order.totalCost,
+                    '利润': order.profit,
+                    '快递公司': order.courier,
+                    '快递单号': order.tracking,
+                    '备注': order.note || '',
+                    'SKU图片URL': order.imageUrl || ''
+                }));
+                
+                // 添加汇总行
+                const totalPaid = orders.reduce((sum, o) => sum + o.paid, 0);
+                const totalCost = orders.reduce((sum, o) => sum + o.cost, 0);
+                const totalShipping = orders.reduce((sum, o) => sum + o.shipping, 0);
+                const totalPacking = orders.reduce((sum, o) => sum + o.packing, 0);
+                const totalOther = orders.reduce((sum, o) => sum + o.other, 0);
+                const totalAllCost = orders.reduce((sum, o) => sum + o.totalCost, 0);
+                const totalProfit = orders.reduce((sum, o) => sum + o.profit, 0);
+                
+                exportData.push({});
+                exportData.push({
+                    '平台': '汇总',
+                    '实付款': totalPaid.toFixed(2),
+                    '产品成本': totalCost.toFixed(2),
+                    '运费': totalShipping.toFixed(2),
+                    '打包费': totalPacking.toFixed(2),
+                    '其他费用': totalOther.toFixed(2),
+                    '总成本': totalAllCost.toFixed(2),
+                    '利润': totalProfit.toFixed(2)
+                });
+                
+                // 导出数据
+                const fileName = `订单数据_${getTimestamp()}.xlsx`;
+                
+                if (exportToExcel(exportData, fileName)) {
+                    showNotification('订单数据导出成功');
+                }
+            }
+    
+            document.addEventListener('DOMContentLoaded', async function () {
+                // 加载数据
+                loadData();
+                
+                // 底部导航切换
+                document.querySelectorAll('.bottom-nav .nav-item[data-tab]').forEach(item => {
+                    item.addEventListener('click', () => {
+                        // 移除所有激活状态
+                        document.querySelectorAll('.bottom-nav .nav-item[data-tab]').forEach(i => i.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        
+                        // 添加当前激活状态
+                        item.classList.add('active');
+                        const tabId = item.getAttribute('data-tab');
+                        document.getElementById(`${tabId}-content`).classList.add('active');
+                    });
+                });
+            
+                // 刷新按钮 - 改为刷新页面
+                document.getElementById('refresh-btn').addEventListener('click', function() {
+                    location.reload();
+                });
+            
+                // 手动横竖屏切换
+                document.getElementById('orientation-toggle').addEventListener('click', function() {
+                    const isLandscape = document.body.classList.toggle('landscape');
+                    const orientationText = isLandscape ? '' : '';
+                    document.getElementById('orientation-text').textContent = orientationText;
+                    saveOrientation(isLandscape);
+                });
+            
+                // 模态框控制
+                const productModal = document.getElementById('edit-product-modal');
+                const orderModal = document.getElementById('edit-order-modal');
+                const closeButtons = document.querySelectorAll('.close-modal');
+                let currentEditIndex = -1;
+                let currentOrderEditIndex = -1;
+            
+                // 打开商品模态框
+                window.editProduct = function(index) {
+                    currentEditIndex = index;
+                    const product = products[index];
+                    document.getElementById('edit-product-name').value = product.productName;
+                    document.getElementById('edit-sku-name').value = product.skuName;
+                    document.getElementById('edit-cost').value = product.cost;
+                    document.getElementById('edit-shipping').value = product.shipping;
+                    document.getElementById('edit-other').value = product.other;
+                    document.getElementById('edit-note').value = product.note;
+                    document.getElementById('edit-product-image').value = product.imageUrl || '';
+                    
+                    // 设置图片预览
+                    const editImagePreview = document.getElementById('edit-image-preview');
+                    if (product.imageUrl) {
+                        editImagePreview.innerHTML = `<img src="${product.imageUrl}" alt="商品预览" style="cursor:pointer;" onclick="showExpandedImage('${product.imageUrl}')">`;
+                    } else {
+                        editImagePreview.innerHTML = `
+                            <div class="image-placeholder">
+                                <i class="fas fa-image"></i>
+                                <p>商品图片预览</p>
+                            </div>
+                        `;
+                    }
+                    
+                    productModal.classList.add('active');
+                }
+                
+                // 打开订单模态框
+                window.editOrder = function(index) {
+                    currentOrderEditIndex = index;
+                    const order = orders[index];
+                    document.getElementById('edit-order-platform').value = order.platform;
+                    document.getElementById('edit-order-shop').value = order.shop;
+                    document.getElementById('edit-order-date').value = order.date;
+                    document.getElementById('edit-order-id').value = order.id;
+                    document.getElementById('edit-order-product').value = order.productName;
+                    document.getElementById('edit-order-sku').value = order.skuName;
+                    document.getElementById('edit-order-paid').value = order.paid;
+                    
+                    // 修复：分别设置各项费用，而不是使用总成本
+                    document.querySelector('.edit-order-cost-cost').value = order.cost;
+                    document.querySelector('.edit-order-cost-shipping').value = order.shipping;
+                    document.querySelector('.edit-order-cost-packing').value = order.packing;
+                    document.querySelector('.edit-order-cost-other').value = order.other;
+                    
+                    document.getElementById('edit-courier').value = order.courier;
+                    document.getElementById('edit-tracking').value = order.tracking;
+                    document.getElementById('edit-order-note').value = order.note;
+                    
+                    orderModal.classList.add('active');
+                }
+            
+                // 关闭模态框
+                closeButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        productModal.classList.remove('active');
+                        orderModal.classList.remove('active');
+                    });
+                });
+            
+                // 点击模态框外部关闭
+                productModal.addEventListener('click', (e) => {
+                    if (e.target === productModal) {
+                        productModal.classList.remove('active');
+                    }
+                });
+                
+                orderModal.addEventListener('click', (e) => {
+                    if (e.target === orderModal) {
+                        orderModal.classList.remove('active');
+                    }
+                });
+            
+                // 成本计算
+                function calculateTotalCost() {
+                    const costInputs = document.querySelectorAll('.cost-cost, .cost-shipping, .cost-other');
+                    let total = 0;
+                    costInputs.forEach(input => {
+                        total += parseFloat(input.value) || 0;
+                    });
+                    document.getElementById('total-cost').textContent = `¥ ${total.toFixed(2)}`;
+                }
+            
+                // 订单成本计算
+                function calculateOrderCost() {
+                    const cost = parseFloat(document.querySelector('.order-cost-cost').value) || 0;
+                    const shipping = parseFloat(document.querySelector('.order-cost-shipping').value) || 0;
+                    const packing = parseFloat(document.querySelector('.order-cost-packing').value) || 0;
+                    const other = parseFloat(document.querySelector('.order-cost-other').value) || 0;
+                    const totalCost = cost + shipping + packing + other;
+                    const paid = parseFloat(document.getElementById('order-paid').value) || 0;
+                    const profit = paid - totalCost;
+                    
+                    document.getElementById('order-total-cost').textContent = `¥ ${totalCost.toFixed(2)}`;
+                    document.getElementById('order-profit').textContent = `¥ ${profit.toFixed(2)}`;
+                }
+            
+                // 初始化成本计算
+                document.querySelectorAll('.cost-cost, .cost-shipping, .cost-other').forEach(input => {
+                    input.addEventListener('input', calculateTotalCost);
+                });
+                
+                document.querySelectorAll('.order-cost-cost, .order-cost-shipping, .order-cost-packing, .order-cost-other, #order-paid').forEach(input => {
+                    input.addEventListener('input', calculateOrderCost);
+                });
+                
+                calculateTotalCost();
+                calculateOrderCost();
+            
+                // 图片预览功能
+                document.getElementById('product-image').addEventListener('input', function() {
+                    const url = this.value.trim();
+                    const preview = document.getElementById('product-image-preview');
+                    if (url) {
+                        preview.innerHTML = `<img src="${url}" alt="商品预览" style="cursor:pointer;" onclick="showExpandedImage('${url}')">`;
+                    } else {
+                        preview.innerHTML = `
+                            <div class="image-placeholder">
+                                <i class="fas fa-image"></i>
+                                <p>图片预览区域</p>
+                            </div>
+                        `;
+                    }
+                });
+                
+                // 编辑模态框图片处理
+                document.getElementById('edit-product-image').addEventListener('input', function() {
+                    const url = this.value.trim();
+                    const preview = document.getElementById('edit-image-preview');
+                    if (url) {
+                        preview.innerHTML = `<img src="${url}" alt="商品预览" style="cursor:pointer;" onclick="showExpandedImage('${url}')">`;
+                    } else {
+                        preview.innerHTML = `
+                            <div class="image-placeholder">
+                                <i class="fas fa-image"></i>
+                                <p>商品图片预览</p>
+                            </div>
+                        `;
+                    }
+                });
+                
+                // 订单图片预览
+                document.getElementById('order-image').addEventListener('input', function() {
+                    const url = this.value.trim();
+                    const preview = document.getElementById('order-image-preview');
+                    if (url) {
+                        preview.innerHTML = `<img src="${url}" alt="订单图片预览" style="cursor:pointer;" onclick="showExpandedImage('${url}')">`;
+                    } else {
+                        preview.innerHTML = `
+                            <div class="image-placeholder">
+                                <i class="fas fa-image"></i>
+                                <p>订单图片预览区域</p>
+                            </div>
+                        `;
+                    }
+                });
+            
+                // 渲染商品表格
+                function renderGoodsTable(data = products) {
+                    const tbody = document.getElementById('goods-table-body');
+                    tbody.innerHTML = '';
+                    
+                    data.forEach((product, index) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${product.productName}</td>
+                            <td>${product.skuName}</td>
+                            <td>
+                                ${product.imageUrl ? 
+                                    `<img src="${product.imageUrl}" class="thumbnail" alt="商品图片" 
+                                    onclick="showExpandedImage('${product.imageUrl}')">` : 
+                                    '<span>无图片</span>'}
+                            </td>
+                            <td>¥${product.cost.toFixed(2)}</td>
+                            <td>¥${product.shipping.toFixed(2)}</td>
+                            <td>¥${product.other.toFixed(2)}</td>
+                            <td>¥${(product.cost + product.shipping + product.other).toFixed(2)}</td>
+                            <td class="action-cell">
+                                <button class="btn btn-warning action-btn" onclick="editProduct(${index})">编辑</button>
+                                <button class="btn btn-danger action-btn" onclick="deleteProduct(${index})">删除</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    
+                    document.getElementById('goods-count').textContent = `共 ${data.length} 条记录`;
+                }
+                
+                // 渲染订单表格（添加汇总计算和备注列）
+                function renderOrdersTable(data = orders) {
+                    const tbody = document.getElementById('orders-table-body');
+                    tbody.innerHTML = '';
+                    
+                    // 初始化汇总
+                    let totalPaidSum = 0; // 新增
+                    let totalCostSum = 0;
+                    let totalShippingSum = 0;
+                    let totalPackingSum = 0;
+                    let totalOtherSum = 0;
+                    let totalAllCostSum = 0;
+                    let totalProfitSum = 0;
+                    
+                    data.forEach((order, index) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${order.platform}</td>
+                            <td>${order.shop}</td>
+                            <td>${order.date}</td>
+                            <td>${order.id}</td>
+                            <td>${order.productName}</td>
+                            <td>${order.skuName}</td>
+                            <td>
+                                ${order.imageUrl ? 
+                                    `<img src="${order.imageUrl}" class="thumbnail" alt="商品图片" 
+                                    onclick="showExpandedImage('${order.imageUrl}')">` : 
+                                    '<span>无图片</span>'}
+                            </td>
+                            <td>¥${order.paid.toFixed(2)}</td>
+                            <td>¥${order.cost.toFixed(2)}</td>
+                            <td>¥${order.shipping.toFixed(2)}</td>
+                            <td>¥${order.packing.toFixed(2)}</td>
+                            <td>¥${order.other.toFixed(2)}</td>
+                            <td>¥${order.totalCost.toFixed(2)}</td>
+                            <td>¥${order.profit.toFixed(2)}</td>
+                            <td>${order.courier}</td>
+                            <td>${order.tracking}</td>
+                            <td>${order.note || ''}</td> <!-- 备注列 -->
+                            <td class="action-cell">
+                                <button class="btn btn-warning action-btn" onclick="editOrder(${index})">编辑</button>
+                                <button class="btn btn-danger action-btn" onclick="deleteOrder(${index})">删除</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                        
+                        // 累加汇总
+                        totalPaidSum += order.paid; // 新增
+                        totalCostSum += order.cost;
+                        totalShippingSum += order.shipping;
+                        totalPackingSum += order.packing;
+                        totalOtherSum += order.other;
+                        totalAllCostSum += order.totalCost;
+                        totalProfitSum += order.profit;
+                    });
+                    
+                    // 更新汇总显示
+                    document.getElementById('total-paid-sum').textContent = `¥${totalPaidSum.toFixed(2)}`; // 新增
+                    document.getElementById('total-cost-sum').textContent = `¥${totalCostSum.toFixed(2)}`;
+                    document.getElementById('total-shipping-sum').textContent = `¥${totalShippingSum.toFixed(2)}`;
+                    document.getElementById('total-packing-sum').textContent = `¥${totalPackingSum.toFixed(2)}`;
+                    document.getElementById('total-other-sum').textContent = `¥${totalOtherSum.toFixed(2)}`;
+                    document.getElementById('total-all-cost-sum').textContent = `¥${totalAllCostSum.toFixed(2)}`;
+                    document.getElementById('total-profit-sum').textContent = `¥${totalProfitSum.toFixed(2)}`;
+                    
+                    document.getElementById('orders-count').textContent = `共 ${data.length} 条记录`;
+                }
+                
+                // 删除商品
+                window.deleteProduct = async function(index) {
+                    if (confirm('确定要删除该商品吗？')) {
+                        products.splice(index, 1);
+                        updateAutocompleteOptions();
+                        renderGoodsTable();
+                        saveData(); // 自动保存
+                        showNotification('商品删除成功');
+                    }
+                }
+                
+                // 删除订单
+                window.deleteOrder = async function(index) {
+                    if (confirm('确定要删除该订单吗？')) {
+                        orders.splice(index, 1);
+                        renderOrdersTable();
+                        saveData(); // 自动保存
+                        showNotification('订单删除成功');
+                    }
+                }
+            
+                // 提交商品
+                document.getElementById('submit-product').addEventListener('click', async function() {
+                    const productName = document.getElementById('product-name').value.trim();
+                    const skuName = document.getElementById('sku-name').value.trim();
+                    const note = document.getElementById('product-note').value.trim();
+                    const imageUrl = document.getElementById('product-image').value.trim();
+                    const cost = parseFloat(document.querySelector('.cost-cost').value) || 0;
+                    const shipping = parseFloat(document.querySelector('.cost-shipping').value) || 0;
+                    const other = parseFloat(document.querySelector('.cost-other').value) || 0;
+            
+                    if (!productName || !skuName) {
+                        showNotification('请填写必填字段', true);
+                        return;
+                    }
+            
+                    products.push({
+                        productName,
+                        skuName,
+                        note,
+                        imageUrl,
+                        cost,
+                        shipping,
+                        other
+                    });
+            
+                    updateAutocompleteOptions();
+                    renderGoodsTable();
+                    saveData(); // 自动保存
+                    showNotification('商品提交成功');
+            
+                    // 重置表单
+                    document.getElementById('product-name').value = '';
+                    document.getElementById('sku-name').value = '';
+                    document.getElementById('product-note').value = '';
+                    document.getElementById('product-image').value = '';
+                    document.querySelector('.cost-cost').value = '0';
+                    document.querySelector('.cost-shipping').value = '0';
+                    document.querySelector('.cost-other').value = '0';
+                    document.getElementById('total-cost').textContent = '¥ 0.00';
+                    document.getElementById('product-image-preview').innerHTML = `
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <p>图片预览区域</p>
+                        </div>
+                    `;
+                });
+                
+                // 提交订单
+                document.getElementById('submit-order').addEventListener('click', async function() {
+                    const platform = document.getElementById('order-platform').value.trim();
+                    const shop = document.getElementById('order-shop').value.trim();
+                    const date = document.getElementById('order-date').value;
+                    const id = document.getElementById('order-id').value.trim();
+                    const productName = document.getElementById('order-product').value.trim();
+                    const skuName = document.getElementById('order-sku').value.trim();
+                    const imageUrl = document.getElementById('order-image').value.trim();
+                    const paid = parseFloat(document.getElementById('order-paid').value) || 0;
+                    const cost = parseFloat(document.querySelector('.order-cost-cost').value) || 0;
+                    const shipping = parseFloat(document.querySelector('.order-cost-shipping').value) || 0;
+                    const packing = parseFloat(document.querySelector('.order-cost-packing').value) || 0;
+                    const other = parseFloat(document.querySelector('.order-cost-other').value) || 0;
+                    const courier = document.getElementById('courier').value.trim();
+                    const tracking = document.getElementById('tracking').value.trim();
+                    const note = document.getElementById('order-note').value.trim();
+                    
+                    const totalCost = cost + shipping + packing + other;
+                    const profit = paid - totalCost;
+            
+                    if (!platform || !shop || !id || !productName || !skuName) {
+                        showNotification('请填写必填字段', true);
+                        return;
+                    }
+            
+                    orders.push({
+                        platform,
+                        shop,
+                        date,
+                        id,
+                        productName,
+                        skuName,
+                        imageUrl,
+                        paid,
+                        cost,
+                        shipping,
+                        packing,
+                        other,
+                        courier,
+                        tracking,
+                        note,
+                        totalCost,
+                        profit
+                    });
+            
+                    renderOrdersTable();
+                    saveData(); // 自动保存
+                    showNotification('订单提交成功');
+            
+                    // 重置表单
+                    document.getElementById('order-platform').value = '';
+                    document.getElementById('order-shop').value = '';
+                    document.getElementById('order-date').value = new Date().toISOString().split('T')[0];
+                    document.getElementById('order-id').value = '';
+                    document.getElementById('order-product').value = '';
+                    document.getElementById('order-sku').value = '';
+                    document.getElementById('order-image').value = '';
+                    document.getElementById('order-paid').value = '0';
+                    document.querySelector('.order-cost-cost').value = '0';
+                    document.querySelector('.order-cost-shipping').value = '0';
+                    document.querySelector('.order-cost-packing').value = '0';
+                    document.querySelector('.order-cost-other').value = '0';
+                    document.getElementById('courier').value = '';
+                    document.getElementById('tracking').value = '';
+                    document.getElementById('order-note').value = '';
+                    calculateOrderCost();
+                    document.getElementById('order-image-preview').innerHTML = `
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                            <p>订单图片预览区域</p>
+                        </div>
+                    `;
+                });
+            
+                // 商品筛选功能
+                document.getElementById('apply-filter').addEventListener('click', function() {
+                    const field = document.getElementById('filter-field').value;
+                    const value = document.getElementById('filter-value').value.trim().toLowerCase();
+                    
+                    if (!value) {
+                        renderGoodsTable();
+                        return;
+                    }
+                    
+                    const filtered = products.filter(product => {
+                        const fieldValue = product[field].toLowerCase();
+                        return fieldValue.includes(value);
+                    });
+                    
+                    renderGoodsTable(filtered);
+                });
+            
+                document.getElementById('clear-filter').addEventListener('click', function() {
+                    document.getElementById('filter-value').value = '';
+                    renderGoodsTable();
+                });
+                
+                // 订单筛选功能
+                document.getElementById('apply-order-filter').addEventListener('click', function() {
+                    const field = document.getElementById('order-filter-field').value;
+                    const value = document.getElementById('order-filter-value').value.trim().toLowerCase();
+                    const dateRange = document.getElementById('date-range').value;
+                    
+                    let startDate = '', endDate = '';
+                    if (dateRange === 'custom') {
+                        startDate = document.getElementById('start-date').value;
+                        endDate = document.getElementById('end-date').value;
+                    } else if (dateRange) {
+                        const days = parseInt(dateRange);
+                        const end = new Date();
+                        const start = new Date();
+                        start.setDate(end.getDate() - days);
+                        
+                        startDate = start.toISOString().split('T')[0];
+                        endDate = end.toISOString().split('T')[0];
+                    }
+                    
+                    const filtered = orders.filter(order => {
+                        // 按字段筛选
+                        if (value) {
+                            const fieldValue = order[field].toString().toLowerCase();
+                            if (!fieldValue.includes(value)) return false;
+                        }
+                        
+                        // 日期范围筛选
+                        if (startDate && endDate) {
+                            if (order.date < startDate || order.date > endDate) return false;
+                        }
+                        
+                        return true;
+                    });
+                    
+                    renderOrdersTable(filtered);
+                });
+                
+                document.getElementById('clear-order-filter').addEventListener('click', function() {
+                    document.getElementById('order-filter-value').value = '';
+                    document.getElementById('date-range').value = '';
+                    document.getElementById('start-date').style.display = 'none';
+                    document.getElementById('end-date').style.display = 'none';
+                    document.getElementById('start-date').value = '';
+                    document.getElementById('end-date').value = '';
+                    
+                    renderOrdersTable();
+                });
+                
+                // 日期范围选择器切换
+                document.getElementById('date-range').addEventListener('change', function() {
+                    const startDate = document.getElementById('start-date');
+                    const endDate = document.getElementById('end-date');
+                    
+                    if (this.value === 'custom') {
+                        startDate.style.display = 'block';
+                        endDate.style.display = 'block';
+                    } else {
+                        startDate.style.display = 'none';
+                        endDate.style.display = 'none';
+                        startDate.value = '';
+                        endDate.value = '';
+                    }
+                });
+            
+                // 保存商品编辑
+                document.getElementById('save-edit').addEventListener('click', async function() {
+                    if (currentEditIndex === -1) return;
+                    
+                    const productName = document.getElementById('edit-product-name').value.trim();
+                    const skuName = document.getElementById('edit-sku-name').value.trim();
+                    const imageUrl = document.getElementById('edit-product-image').value.trim();
+                    const cost = parseFloat(document.getElementById('edit-cost').value) || 0;
+                    const shipping = parseFloat(document.getElementById('edit-shipping').value) || 0;
+                    const other = parseFloat(document.getElementById('edit-other').value) || 0;
+                    const note = document.getElementById('edit-note').value.trim();
+                    
+                    if (!productName || !skuName) {
+                        showNotification('请填写必填字段', true);
+                        return;
+                    }
+                    
+                    products[currentEditIndex] = {
+                        ...products[currentEditIndex],
+                        productName,
+                        skuName,
+                        imageUrl,
+                        cost,
+                        shipping,
+                        other,
+                        note
+                    };
+                    
+                    updateAutocompleteOptions();
+                    renderGoodsTable();
+                    saveData(); // 自动保存
+                    productModal.classList.remove('active');
+                    showNotification('商品信息更新成功');
+                    currentEditIndex = -1; // 重置编辑索引
+                });
+                
+                // 保存订单编辑
+                document.getElementById('save-order-edit').addEventListener('click', async function() {
+                    if (currentOrderEditIndex === -1) return;
+                    
+                    const platform = document.getElementById('edit-order-platform').value.trim();
+                    const shop = document.getElementById('edit-order-shop').value.trim();
+                    const date = document.getElementById('edit-order-date').value;
+                    const id = document.getElementById('edit-order-id').value.trim();
+                    const productName = document.getElementById('edit-order-product').value.trim();
+                    const skuName = document.getElementById('edit-order-sku').value.trim();
+                    const paid = parseFloat(document.getElementById('edit-order-paid').value) || 0;
+                    const cost = parseFloat(document.querySelector('.edit-order-cost-cost').value) || 0;
+                    const shipping = parseFloat(document.querySelector('.edit-order-cost-shipping').value) || 0;
+                    const packing = parseFloat(document.querySelector('.edit-order-cost-packing').value) || 0;
+                    const other = parseFloat(document.querySelector('.edit-order-cost-other').value) || 0;
+                    const courier = document.getElementById('edit-courier').value.trim();
+                    const tracking = document.getElementById('edit-tracking').value.trim();
+                    const note = document.getElementById('edit-order-note').value.trim();
+                    
+                    const totalCost = cost + shipping + packing + other;
+                    const profit = (paid || 0) - totalCost;
+                    
+                    if (!platform || !shop || !id || !productName || !skuName) {
+                        showNotification('请填写必填字段', true);
+                        return;
+                    }
+                    
+                    orders[currentOrderEditIndex] = {
+                        ...orders[currentOrderEditIndex],
+                        platform,
+                        shop,
+                        date,
+                        id,
+                        productName,
+                        skuName,
+                        paid,
+                        cost,
+                        shipping,
+                        packing,
+                        other,
+                        courier,
+                        tracking,
+                        note,
+                        totalCost,
+                        profit
+                    };
+                    
+                    renderOrdersTable();
+                    saveData(); // 自动保存
+                    orderModal.classList.remove('active');
+                    showNotification('订单信息更新成功');
+                    currentOrderEditIndex = -1; // 重置编辑索引
+                });
+                
+                // 商品自动填充功能 - 修复版
+                document.getElementById('order-product').addEventListener('input', function() {
+                    const value = this.value.trim().toLowerCase();
+                    if (!value) return;
+                    
+                    const matchedProducts = products.filter(p => 
+                        p.productName.toLowerCase().includes(value)
+                    );
+                    
+                    if (matchedProducts.length > 0) {
+                        const matchedProduct = matchedProducts[0];
+                        document.getElementById('order-sku').value = matchedProduct.skuName;
+                        document.getElementById('order-image').value = matchedProduct.imageUrl || '';
+                        // 计算商品的总成本（成本+运费+其他）
+                        const totalCost = (matchedProduct.cost || 0) + 
+                                         (matchedProduct.shipping || 0) + 
+                                         (matchedProduct.other || 0);
+                        document.querySelector('.order-cost-cost').value = totalCost;
+                        
+                        // 预览图片
+                        if (matchedProduct.imageUrl) {
+                            document.getElementById('order-image-preview').innerHTML = 
+                                `<img src="${matchedProduct.imageUrl}" alt="订单图片预览" style="cursor:pointer;" 
+                                onclick="showExpandedImage('${matchedProduct.imageUrl}')">`;
+                        } else {
+                            document.getElementById('order-image-preview').innerHTML = `
+                                <div class="image-placeholder">
+                                    <i class="fas fa-image"></i>
+                                    <p>订单图片预览区域</p>
+                                </div>
+                            `;
+                        }
+                        
+                        calculateOrderCost();
+                    }
+                });
+                
+                // SKU选择功能
+                document.getElementById('select-sku-btn').addEventListener('click', function() {
+                    const productName = document.getElementById('order-product').value.trim();
+                    if (!productName) {
+                        showNotification('请先选择商品', true);
+                        return;
+                    }
+                    
+                    // 获取该商品的所有SKU
+                    const productSkus = products.filter(p => p.productName === productName);
+                    
+                    if (productSkus.length === 0) {
+                        showNotification('该商品没有SKU数据', true);
+                        return;
+                    }
+                    
+                    // 设置当前选择的商品
+                    currentSelectedProduct = productName;
+                    document.getElementById('current-product-name').textContent = productName;
+                    
+                    // 生成SKU选项
+                    const skuOptions = document.getElementById('sku-options');
+                    skuOptions.innerHTML = '';
+                    
+                    productSkus.forEach(sku => {
+                        const option = document.createElement('div');
+                        option.className = 'sku-option';
+                        option.textContent = sku.skuName;
+                        // 计算并存储总成本
+                        const totalCost = (sku.cost || 0) + 
+                                         (sku.shipping || 0) + 
+                                         (sku.other || 0);
+                        option.dataset.total = totalCost;
+                        option.dataset.image = sku.imageUrl || '';
+                        
+                        option.addEventListener('click', function() {
+                            // 移除所有选中状态
+                            document.querySelectorAll('.sku-option').forEach(opt => {
+                                opt.classList.remove('selected');
+                            });
+                            
+                            // 添加当前选中状态
+                            this.classList.add('selected');
+                            
+                            // 设置SKU值
+                            document.getElementById('order-sku').value = this.textContent;
+                            
+                            // 设置成本
+                             document.querySelector('.order-cost-cost').value = this.dataset.total;
+                            
+                            // 设置图片
+                            document.getElementById('order-image').value = this.dataset.image;
+                            
+                            // 预览图片
+                            if (this.dataset.image) {
+                                document.getElementById('order-image-preview').innerHTML = 
+                                    `<img src="${this.dataset.image}" alt="订单图片预览" style="cursor:pointer;" 
+                                    onclick="showExpandedImage('${this.dataset.image}')">`;
+                            } else {
+                                document.getElementById('order-image-preview').innerHTML = `
+                                    <div class="image-placeholder">
+                                        <i class="fas fa-image"></i>
+                                        <p>订单图片预览区域</p>
+                                    </div>
+                                `;
+                            }
+                            
+                            // 计算成本
+                            calculateOrderCost();
+                            
+                            // 关闭选择器
+                            document.getElementById('sku-selector').classList.remove('active');
+                        });
+                        
+                        skuOptions.appendChild(option);
+                    });
+                    
+                    // 显示SKU选择器
+                    document.getElementById('sku-selector').classList.add('active');
+                });
+                
+                // 关闭SKU选择器
+                document.getElementById('close-sku-selector').addEventListener('click', function() {
+                    document.getElementById('sku-selector').classList.remove('active');
+                });
+                
+                // 导出商品功能
+                document.getElementById('export-goods').addEventListener('click', exportGoodsData);
+                
+                // 导出订单功能
+                document.getElementById('export-orders').addEventListener('click', exportOrdersData);
+                
+                // 商品批量导入功能（自动导入）
+                document.getElementById('import-goods-excel-btn').addEventListener('click', async function() {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,*/*';
+                    input.onchange = function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            document.getElementById('goods-file-name').textContent = file.name;
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                try {
+                                    const data = new Uint8Array(e.target.result);
+                                    const workbook = XLSX.read(data, {type: 'array'});
+                                    const firstSheetName = workbook.SheetNames[0];
+                                    const worksheet = workbook.Sheets[firstSheetName];
+                                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                                    
+                                    let count = 0;
+                                    jsonData.forEach(item => {
+                                        // 检查必要字段
+                                        if (item['商品名称'] && item['SKU名称/规格']) {
+                                            products.push({
+                                                productName: item['商品名称'],
+                                                skuName: item['SKU名称/规格'],
+                                                cost: item['成本'] || 0,
+                                                shipping: item['运费'] || 0,
+                                                other: item['其他费用'] || 0,
+                                                note: item['备注'] || '',
+                                                imageUrl: item['图片URL'] || ''
+                                            });
+                                            count++;
+                                        }
+                                    });
+                                    showNotification(`成功导入 ${count} 条商品数据`);
+                                    
+                                    updateAutocompleteOptions();
+                                    renderGoodsTable();
+                                    saveData(); // 自动保存
+                                } catch (error) {
+                                    showNotification('导入失败: ' + error.message, true);
+                                }
+                            };
+                            reader.readAsArrayBuffer(file);
+                        }
+                    };
+                    input.click();
+                });
+                
+                document.getElementById('import-goods-json-btn').addEventListener('click', async function() {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.json,application/json,*/*';
+                    input.onchange = function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            document.getElementById('goods-file-name').textContent = file.name;
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                try {
+                                    const jsonData = JSON.parse(e.target.result);
+                                    
+                                    let count = 0;
+                                    jsonData.forEach(item => {
+                                        // 检查必要字段
+                                        if (item.productName && item.skuName) {
+                                            products.push({
+                                                productName: item.productName,
+                                                skuName: item.skuName,
+                                                cost: item.cost || 0,
+                                                shipping: item.shipping || 0,
+                                                other: item.other || 0,
+                                                note: item.note || '',
+                                                imageUrl: item.imageUrl || ''
+                                            });
+                                            count++;
+                                        }
+                                    });
+                                    showNotification(`成功导入 ${count} 条商品数据`);
+                                    
+                                    updateAutocompleteOptions();
+                                    renderGoodsTable();
+                                    saveData(); // 自动保存
+                                } catch (error) {
+                                    showNotification('导入失败: ' + error.message, true);
+                                }
+                            };
+                            reader.readAsText(file);
+                        }
+                    };
+                    input.click();
+                });
+                
+                // 订单批量导入功能（自动导入）
+                document.getElementById('import-orders-excel-btn').addEventListener('click', async function() {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,*/*';
+                    input.onchange = function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            document.getElementById('orders-file-name').textContent = file.name;
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                try {
+                                    const data = new Uint8Array(e.target.result);
+                                    const workbook = XLSX.read(data, {type: 'array'});
+                                    const firstSheetName = workbook.SheetNames[0];
+                                    const worksheet = workbook.Sheets[firstSheetName];
+                                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                                    
+                                    let count = 0;
+                                    jsonData.forEach(item => {
+                                        // 检查必要字段
+                                        if (item['订单号'] && item['商品名称'] && item['SKU名称/规格']) {
+                                            const cost = item['产品成本'] || 0;
+                                            const shipping = item['运费'] || 0;
+                                            const packing = item['打包费'] || 0;
+                                            const other = item['其他费用'] || 0;
+                                            const totalCost = cost + shipping + packing + other;
+                                            const profit = (item['实付款'] || 0) - totalCost;
+                                            
+                                            orders.push({
+                                                platform: item['平台'] || '',
+                                                shop: item['店铺名'] || '',
+                                                date: item['订单日期'] || new Date().toISOString().split('T')[0],
+                                                id: item['订单号'],
+                                                productName: item['商品名称'],
+                                                skuName: item['SKU名称/规格'],
+                                                imageUrl: item['图片URL'] || '',
+                                                paid: item['实付款'] || 0,
+                                                cost: cost,
+                                                shipping: shipping,
+                                                packing: packing,
+                                                other: other,
+                                                courier: item['快递公司'] || '',
+                                                tracking: item['快递单号'] || '',
+                                                note: item['备注'] || '',
+                                                totalCost: totalCost,
+                                                profit: profit
+                                            });
+                                            count++;
+                                        }
+                                    });
+                                    showNotification(`成功导入 ${count} 条订单数据`);
+                                    
+                                    renderOrdersTable();
+                                    saveData(); // 自动保存
+                                } catch (error) {
+                                    showNotification('导入失败: ' + error.message, true);
+                                }
+                            };
+                            reader.readAsArrayBuffer(file);
+                        }
+                    };
+                    input.click();
+                });
+                
+                document.getElementById('import-orders-json-btn').addEventListener('click', async function() {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.json,application/json,*/*';
+                    input.onchange = function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            document.getElementById('orders-file-name').textContent = file.name;
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                try {
+                                    const jsonData = JSON.parse(e.target.result);
+                                    
+                                    let count = 0;
+                                    jsonData.forEach(item => {
+                                        // 检查必要字段
+                                        if (item.id && item.productName && item.skuName) {
+                                            const cost = item.cost || 0;
+                                            const shipping = item.shipping || 0;
+                                            const packing = item.packing || 0;
+                                            const other = item.other || 0;
+                                            const totalCost = cost + shipping + packing + other;
+                                            const profit = (item.paid || 0) - totalCost;
+                                            
+                                            orders.push({
+                                                platform: item.platform || '',
+                                                shop: item.shop || '',
+                                                date: item.date || new Date().toISOString().split('T')[0],
+                                                id: item.id,
+                                                productName: item.productName,
+                                                skuName: item.skuName,
+                                                imageUrl: item.imageUrl || '',
+                                                paid: item.paid || 0,
+                                                cost: cost,
+                                                shipping: shipping,
+                                                packing: packing,
+                                                other: other,
+                                                courier: item.courier || '',
+                                                tracking: item.tracking || '',
+                                                note: item.note || '',
+                                                totalCost: totalCost,
+                                                profit: profit
+                                            });
+                                            count++;
+                                        }
+                                    });
+                                    showNotification(`成功导入 ${count} 条订单数据`);
+                                    
+                                    renderOrdersTable();
+                                    saveData(); // 自动保存
+                                } catch (error) {
+                                    showNotification('导入失败: ' + error.message, true);
+                                }
+                            };
+                            reader.readAsText(file);
+                        }
+                    };
+                    input.click();
+                });
+                
+                // 更新自动补全选项
+                function updateAutocompleteOptions() {
+                    const productNames = [...new Set(products.map(p => p.productName))];
+                    const skuNames = [...new Set(products.map(p => p.skuName))];
+                    
+                    // 存储到全局变量以便在自动补全中使用
+                    window.allProductNames = productNames;
+                    window.allSkuNames = skuNames;
+                    
+                    // 更新订单部分的自动补全
+                    window.allPlatforms = [...new Set(orders.map(o => o.platform))];
+                    window.allShops = [...new Set(orders.map(o => o.shop))];
+                }
+                
+                // 折叠面板功能（修复版 - 事件委托）
+                document.addEventListener('click', function(e) {
+                    const header = e.target.closest('.collapsible-header');
+                    if (header) {
+                        const contentId = header.id.replace('-header', '-content');
+                        const content = document.getElementById(contentId);
+                        if (content) {
+                            header.classList.toggle('expanded');
+                            content.classList.toggle('expanded');
+                        }
+                    }
+                });
+                
+                // 初始化
+                updateAutocompleteOptions();
+                renderGoodsTable();
+                renderOrdersTable();
+                calculateTotalCost();
+                calculateOrderCost();
+            
+                // 通知功能
+                function showNotification(message, isError = false) {
+                    const notification = document.getElementById('notification');
+                    notification.textContent = message;
+                    notification.className = 'notification show' + (isError ? ' error' : '');
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                    }, 3000);
+                }
+                
+                // 自动补全功能
+                function setupAutocomplete(inputElement, suggestions, containerId) {
+                    let currentFocus;
+                    const container = document.getElementById(containerId);
+                    
+                    // 添加下拉按钮点击事件
+                    const dropdownButton = inputElement.closest('.input-with-dropdown')?.querySelector('.dropdown-button');
+                    if (dropdownButton) {
+                        dropdownButton.addEventListener('click', function() {
+                            // 如果容器已显示，则关闭
+                            if (container.style.display === 'block') {
+                                container.style.display = 'none';
+                                return;
+                            }
+                            
+                            // 否则显示所有选项
+                            const val = inputElement.value.trim().toLowerCase();
+                            container.innerHTML = '';
+                            
+                            // 过滤建议
+                            const filtered = suggestions.filter(item => 
+                                !val || item.toLowerCase().includes(val)
+                            );
+                            
+                            if (filtered.length === 0) {
+                                container.style.display = 'none';
+                                return;
+                            }
+                            
+                            container.style.display = 'block';
+                            
+                            // 创建建议项
+                            filtered.forEach(item => {
+                                const div = document.createElement('div');
+                                div.innerHTML = item;
+                                div.addEventListener('click', function() {
+                                    inputElement.value = item;
+                                    container.style.display = 'none';
+                                    
+                                    // 特殊处理：当选择订单商品时
+                                    if (inputElement.id === 'order-product') {
+                                        // 触发SKU选择功能
+                                        document.getElementById('select-sku-btn').click();
+                                    }
+                                });
+                                container.appendChild(div);
+                            });
+                        });
+                    }
+                    
+                    inputElement.addEventListener('input', function(e) {
+                        const val = this.value.trim();
+                        closeAllLists();
+                        if (!val) return false;
+                        currentFocus = -1;
+                        
+                        container.innerHTML = '';
+                        
+                        // 过滤建议
+                        const filtered = suggestions.filter(item => 
+                            item.toLowerCase().includes(val.toLowerCase())
+                        );
+                        
+                        if (filtered.length === 0) {
+                            container.style.display = 'none';
+                            return;
+                        }
+                        
+                        container.style.display = 'block';
+                        
+                        // 创建建议项
+                        filtered.forEach(item => {
+                            const div = document.createElement('div');
+                            div.innerHTML = item;
+                            div.addEventListener('click', function() {
+                                inputElement.value = item;
+                                closeAllLists();
+                                
+                                // 特殊处理：当选择订单商品时
+                                if (inputElement.id === 'order-product') {
+                                    // 触发SKU选择功能
+                                    document.getElementById('select-sku-btn').click();
+                                }
+                            });
+                            container.appendChild(div);
+                        });
+                    });
+                    
+                    inputElement.addEventListener('keydown', function(e) {
+                        let items = container.getElementsByTagName('div');
+                        
+                        if (e.keyCode === 40) { // 向下箭头
+                            currentFocus++;
+                            addActive(items);
+                        } else if (e.keyCode === 38) { // 向上箭头
+                            currentFocus--;
+                            addActive(items);
+                        } else if (e.keyCode === 13) { // Enter键
+                            e.preventDefault();
+                            if (currentFocus > -1) {
+                                if (items) items[currentFocus].click();
+                            }
+                        }
+                    });
+                    
+                    function addActive(items) {
+                        if (!items) return false;
+                        removeActive(items);
+                        if (currentFocus >= items.length) currentFocus = 0;
+                        if (currentFocus < 0) currentFocus = (items.length - 1);
+                        items[currentFocus].classList.add('autocomplete-active');
+                    }
+                    
+                    function removeActive(items) {
+                        for (let i = 0; i < items.length; i++) {
+                            items[i].classList.remove('autocomplete-active');
+                        }
+                    }
+                    
+                    function closeAllLists() {
+                        const items = document.getElementsByClassName('autocomplete-items');
+                        for (let i = 0; i < items.length; i++) {
+                            items[i].style.display = 'none';
+                        }
+                    }
+                    
+                    // 点击外部关闭下拉框
+                    document.addEventListener('click', function(e) {
+                        if (!e.target.closest('.autocomplete-container')) {
+                            closeAllLists();
+                        }
+                    });
+                }
+                
+                // 初始化自动补全
+                setupAutocomplete(
+                    document.getElementById('product-name'), 
+                    window.allProductNames, 
+                    'product-autocomplete'
+                );
+                
+                setupAutocomplete(
+                    document.getElementById('sku-name'), 
+                    window.allSkuNames, 
+                    'sku-autocomplete'
+                );
+                
+                setupAutocomplete(
+                    document.getElementById('order-platform'), 
+                    window.allPlatforms, 
+                    'platform-autocomplete'
+                );
+                
+                setupAutocomplete(
+                    document.getElementById('order-shop'), 
+                    window.allShops, 
+                    'shop-autocomplete'
+                );
+                
+                setupAutocomplete(
+                    document.getElementById('order-product'), 
+                    window.allProductNames, 
+                    'product-order-autocomplete'
+                );
+                
+                // 设置订单日期为今天
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('order-date').value = today;
+                
+                // 设置初始方向
+                const savedOrientation = localStorage.getItem(ORIENTATION_KEY);
+                if (savedOrientation === 'landscape') {
+                    document.body.classList.add('landscape');
+                    document.getElementById('orientation-text').textContent = '竖';
+                } else {
+                    document.getElementById('orientation-text').textContent = '横';
+                }
+            });
+            
+            // 图片放大功能
+            window.showExpandedImage = function(src) {
+                const modal = document.getElementById('image-modal');
+                const img = document.getElementById('expanded-image');
+                img.src = src;
+                modal.classList.add('active');
+                
+                // 点击关闭按钮
+                document.querySelector('.close-image-modal').onclick = function() {
+                    modal.classList.remove('active');
+                }
+                
+                // 点击模态框外部关闭
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            }
+        
+            // 新增：每日首次弹窗功能
+            document.addEventListener('DOMContentLoaded', function() {
+                // 检查是否需要显示弹窗
+                function shouldShowNotice() {
+                    const today = new Date().toDateString();
+                    const lastNoticeDate = localStorage.getItem('lastNoticeDate');
+                    
+                    // 如果今天没有显示过弹窗
+                    if (lastNoticeDate !== today) {
+                        localStorage.setItem('lastNoticeDate', today);
+                        return true;
+                    }
+                    return false;
+                }
+                
+                // 显示弹窗
+                function showNotice() {
+                    const modal = document.getElementById('notice-modal');
+                    const countdownEl = document.getElementById('countdown');
+                    const closeBtn = document.getElementById('close-notice');
+                    
+                    modal.classList.add('active');
+                    
+                    // 倒计时功能
+                    let seconds = 5;
+                    countdownEl.textContent = seconds;
+                    
+                    const countdownInterval = setInterval(() => {
+                        seconds--;
+                        countdownEl.textContent = seconds;
+                        
+                        if (seconds <= 0) {
+                            clearInterval(countdownInterval);
+                            // 显示关闭按钮
+                            closeBtn.classList.add('active');
+                        }
+                    }, 1000);
+                    
+                    // 关闭弹窗
+                    closeBtn.addEventListener('click', function() {
+                        modal.classList.remove('active');
+                    });
+                }
+                
+                // 检查并显示弹窗
+                if (shouldShowNotice()) {
+                    // 延迟显示弹窗，让页面先加载
+                    setTimeout(showNotice, 500);
+                }
+            });
+            
+            // 保存屏幕方向设置
+            function saveOrientation(isLandscape) {
+                localStorage.setItem(ORIENTATION_KEY, isLandscape ? 'landscape' : 'portrait');
+            }
+        </script>
+    </body>
+    </html>
