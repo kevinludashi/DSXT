@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>商品与订单管理系统v9</title>
+    <title>商品与订单管理系统</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* 基础样式保持不变 */
@@ -776,6 +776,26 @@
                 min-width: auto; /* 移除固定最小宽度 */
             }
         }
+        
+        /* 新增：汇总折叠标题样式 */
+        .summary-header {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            transition: background 0.2s;
+        }
+        .summary-header:hover {
+            background: #f0f7ff;
+        }
+        .summary-header i {
+            transition: transform 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -1211,35 +1231,42 @@
         <div class="card">
             <h2><i class="fas fa-receipt"></i>订单列表</h2>
             
-            <!-- 新增：订单汇总信息栏 -->
-            <div class="summary-bar" id="orderSummaryBar">
-                <div class="summary-item">
-                    <div class="summary-label">实付款</div>
-                    <div class="summary-value" id="summaryAmountPaid">0.00</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">成本</div>
-                    <div class="summary-value" id="summaryCost">0.00</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">运费</div>
-                    <div class="summary-value" id="summaryShipping">0.00</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">打包费</div>
-                    <div class="summary-value" id="summaryPackingFee">0.00</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">其他费用</div>
-                    <div class="summary-value" id="summaryOtherCosts">0.00</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">总成本</div>
-                    <div class="summary-value" id="summaryTotalCost">0.00</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">利润</div>
-                    <div class="summary-value" id="summaryProfit">0.00</div>
+            <!-- 修改：将汇总栏放入可折叠区域 -->
+            <div class="summary-header" onclick="toggleCollapse(this)">
+                <i class="fas fa-calculator"></i>
+                <span>订单汇总</span>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="collapsible-content" id="orderSummarySection">
+                <div class="summary-bar" id="orderSummaryBar">
+                    <div class="summary-item">
+                        <div class="summary-label">实付款</div>
+                        <div class="summary-value" id="summaryAmountPaid">0.00</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">成本</div>
+                        <div class="summary-value" id="summaryCost">0.00</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">运费</div>
+                        <div class="summary-value" id="summaryShipping">0.00</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">打包费</div>
+                        <div class="summary-value" id="summaryPackingFee">0.00</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">其他费用</div>
+                        <div class="summary-value" id="summaryOtherCosts">0.00</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">总成本</div>
+                        <div class="summary-value" id="summaryTotalCost">0.00</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">利润</div>
+                        <div class="summary-value" id="summaryProfit">0.00</div>
+                    </div>
                 </div>
             </div>
             
@@ -2407,7 +2434,19 @@
                 items = [...new Set(products.map(p => p.name))];
             } else if (type === 'sku' || type === 'orderSku') {
                 title = '选择SKU/规格';
-                items = [...new Set(products.map(p => p.sku))];
+                // 优化：根据商品名称过滤SKU
+                const productName = type === 'orderSku' 
+                    ? document.getElementById('orderProductName').value.trim()
+                    : document.getElementById('productName').value.trim();
+                
+                if (productName) {
+                    // 只显示当前商品名称下的SKU
+                    items = [...new Set(products
+                        .filter(p => p.name === productName)
+                        .map(p => p.sku))];
+                } else {
+                    items = [...new Set(products.map(p => p.sku))];
+                }
             } else if (type === 'shop') {
                 title = '选择店铺名';
                 items = [...new Set(orders.map(o => o.shop))];
@@ -2431,6 +2470,8 @@
                         } else if (type === 'orderName') {
                             document.getElementById('orderProductName').value = this.dataset.value;
                             updateSkuOptions();
+                            // 更新SKU自动补全列表
+                            updateSkuAutocompleteByProductName(this.dataset.value);
                         } else if (type === 'orderSku') {
                             document.getElementById('orderSku').value = this.dataset.value;
                             populateCost();
@@ -2441,6 +2482,33 @@
             }
             modalTitle.textContent = title;
             modal.style.display = 'flex';
+        }
+        
+        // 根据商品名称更新SKU自动补全
+        function updateSkuAutocompleteByProductName(productName) {
+            const autocompleteList = document.getElementById('orderSkuAutocomplete');
+            let skus = [];
+            
+            if (productName) {
+                // 只获取当前商品名称下的SKU
+                skus = [...new Set(products
+                    .filter(p => p.name === productName)
+                    .map(p => p.sku))];
+            } else {
+                skus = [...new Set(products.map(p => p.sku))];
+            }
+            
+            autocompleteList.innerHTML = skus.map(sku => 
+                `<div class="autocomplete-item" data-value="${sku}">${sku}</div>`
+            ).join('');
+            
+            // 重新绑定事件
+            autocompleteList.querySelectorAll('.autocomplete-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.getElementById('orderSku').value = this.dataset.value;
+                    populateCost();
+                });
+            });
         }
         
         // 更新自动补全列表
@@ -2519,6 +2587,8 @@
                     // 根据输入框ID执行后续操作
                     if (inputId === 'orderProductName') {
                         updateSkuOptions();
+                        // 更新SKU自动补全列表
+                        updateSkuAutocompleteByProductName(this.dataset.value);
                     } else if (inputId === 'orderSku') {
                         populateCost();
                     } else if (inputId === 'searchInput') {
@@ -2585,13 +2655,20 @@
         // 切换折叠状态
         function toggleCollapse(element) {
             const content = element.nextElementSibling;
-            const icon = element.querySelector('.fa-chevron-down');
+            const icon = element.querySelector('.fa-chevron-down, .fa-chevron-right');
+            
             if (content.classList.contains('active')) {
                 content.classList.remove('active');
-                if (icon) icon.classList.replace('fa-chevron-down', 'fa-chevron-right');
+                if (icon) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-right');
+                }
             } else {
                 content.classList.add('active');
-                if (icon) icon.classList.replace('fa-chevron-right', 'fa-chevron-down');
+                if (icon) {
+                    icon.classList.remove('fa-chevron-right');
+                    icon.classList.add('fa-chevron-down');
+                }
             }
         }
         
